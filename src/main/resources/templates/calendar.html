@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Goal Mate</title>
+    <link th:href="@{/css/common.css}" href="../css/common.css" rel="stylesheet">
+    <link th:href="@{/css/modal.css}" href="../css/modal.css" rel="stylesheet">
+</head>
+<body>
+<button id="openAddGoalModal">추가</button>
+
+<dialog class="modalContent" id="addGoalModal">
+    <form method="dialog"> 
+        <h3>새 목표 추가</h3>
+        <div>
+            <input type="radio" id="daily" name="typeInput" value="DAILY" checked>
+            <label for="daily">일간</label>
+            <input type="radio" id="weekly" name="typeInput" value="WEEKLY">
+            <label for="weekly">주간</label>
+            <input type="radio" id="monthly" name="typeInput" value="MONTHLY">
+            <label for="monthly">월간</label>
+            <input type="radio" id="yearly" name="typeInput" value="YEARLY">
+            <label for="yearly">연간</label>
+        </div>
+
+        <input type="text" id="taskInput" placeholder="할 일 입력">
+
+        <label for="startDateInput">시작일</label>
+        <input type="date" id="startDateInput">
+
+        <label for="dueDateInput">종료일</label>
+        <input type="date" id="dueDateInput">
+        <div>
+            <button type="button" id="addGoalBtn">추가</button>
+            <button type="submit">닫기</button>
+        </div>
+    </form>
+</dialog>
+<script>
+    const addGoalModal = document.getElementById('addGoalModal');
+    const openAddGoalModalBtn = document.getElementById('openAddGoalModal');
+    const addGoalBtn = document.getElementById('addGoalBtn');
+
+    // 모달 열기
+    openAddGoalModalBtn.addEventListener('click', () => {
+        addGoalModal.showModal(); //show() 대신 showModal()을 써야 배경이 생김
+    });
+
+    document.getElementById('startDateInput').addEventListener('change', e => {
+        const selectedType = document.querySelector('input[name="typeInput"]:checked').value;
+        const dueDateInput = document.getElementById('dueDateInput');
+        let date = new Date(e.target.value);
+
+        if(selectedType == 'DAILY') {
+            dueDateInput.value = e.target.value;
+        } else if(selectedType == 'WEEKLY') {
+            const day = date.getDay();
+            date.setDate(date.getDate() - day); //일요일
+            e.target.value = date.toLocaleDateString('en-CA');
+
+            date.setDate(date.getDate() + 6); //토요일
+            dueDateInput.value = date.toLocaleDateString('en-CA');
+        } else if(selectedType == 'MONTHLY') {
+            date.setDate(1);
+            e.target.value = date.toLocaleDateString('en-CA');
+
+            date.setMonth(date.getMonth()+1);
+            date.setDate(0);
+            dueDateInput.value = date.toLocaleDateString('en-CA');
+        } else if(selectedType == 'YEARLY') {
+            const year = e.target.value.split('-')[0];
+            e.target.value = `${year}-01-01`;
+            dueDateInput.value = `${year}-12-31`;
+        } else {
+            alert('유효한 선택이 아닙니다.');
+        }
+    });
+
+    addGoalBtn.addEventListener('click', () => {
+        const addGoalData = {
+            task: document.getElementById('taskInput').value,
+            type: document.querySelector('input[name="typeInput"]:checked').value,
+            startDate: document.getElementById('startDateInput').value,
+            dueDate: document.getElementById('dueDateInput').value
+        };
+
+        fetch('/goals', {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json' 
+            },
+            body: JSON.stringify(addGoalData)
+        })
+        .then(response => {
+            return response.text().then(msg => {
+                if (response.ok) {
+                    alert(msg);
+                    location.reload();
+                } else {
+                    throw new Error(msg);
+                }
+            });
+        })
+        .catch(error => {
+            alert(error.message);
+        });
+    });
+</script>
+</body>
+</html>
