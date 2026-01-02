@@ -1,5 +1,6 @@
 package com.gm.goalmate.domain.goal;
 
+import com.gm.goalmate.domain.user.User;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,9 +17,7 @@ import java.time.LocalDate;
 public class Goal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long goalNum;
-
-    private Long writerId; //User로 변경
+    private Long goalId;
 
     @Column(nullable = false)
     private String task;
@@ -38,4 +37,15 @@ public class Goal {
     @Column(nullable = false)
     @Temporal(value = TemporalType.DATE)
     private LocalDate dueDate; //종료일
+
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
+    public void updateGoal(GoalType type, String task, LocalDate startDate, LocalDate dueDate) {
+        this.type = type;
+        this.task = task;
+        this.startDate = startDate;
+        this.dueDate = dueDate;
+    }
 }

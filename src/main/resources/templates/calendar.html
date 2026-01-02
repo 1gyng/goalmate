@@ -36,14 +36,13 @@
         </div>
     </form>
 </dialog>
+<script type="text/javascript" src="/js/modal.js"></script>
+<script type="text/javascript" src="/js/apiUtil.js"></script>
 <script>
     const addGoalModal = document.getElementById('addGoalModal');
-    const openAddGoalModalBtn = document.getElementById('openAddGoalModal');
-    const addGoalBtn = document.getElementById('addGoalBtn');
 
-    // 모달 열기
-    openAddGoalModalBtn.addEventListener('click', () => {
-        addGoalModal.showModal(); //show() 대신 showModal()을 써야 배경이 생김
+    document.getElementById('openAddGoalModal').addEventListener('click', () => {
+        openModal(addGoalModal);
     });
 
     document.getElementById('startDateInput').addEventListener('change', e => {
@@ -76,35 +75,23 @@
         }
     });
 
-    addGoalBtn.addEventListener('click', () => {
+    document.getElementById('addGoalBtn').addEventListener('click', () => {
         const addGoalData = {
             task: document.getElementById('taskInput').value,
             type: document.querySelector('input[name="typeInput"]:checked').value,
             startDate: document.getElementById('startDateInput').value,
             dueDate: document.getElementById('dueDateInput').value
         };
+        
+        requestPost('/goals', addGoalData).then(result => {
+            alert(result.serverMessage)
 
-        fetch('/goals', {
-            method: 'POST',
-            headers: { 
-                'Content-Type': 'application/json' 
-            },
-            body: JSON.stringify(addGoalData)
-        })
-        .then(response => {
-            return response.text().then(msg => {
-                if (response.ok) {
-                    alert(msg);
-                    location.reload();
-                } else {
-                    throw new Error(msg);
-                }
-            });
-        })
-        .catch(error => {
-            alert(error.message);
+            if(result.isSuccess){
+                location.reload();
+            }
         });
     });
+
 </script>
 </body>
 </html>

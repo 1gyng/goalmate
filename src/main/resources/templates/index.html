@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Goal Mate</title>
+</head>
+<body>
+<button id="openLoginModal">로그인</button>
+<button id="openJoinModal">회원가입</button>
+
+<h2>Goal Mate에 대한 소개...</h2>
+
+<dialog class="modalContent" id="loginModal">
+    <form method="dialog"> 
+        <h3>로그인</h3>
+        <input type="text" id="loginIdInput" placeholder="아이디">
+        <input type="password" id="passwordInput" placeholder="비밀번호">
+        <div id="loginErrorMsg"></div>
+        <button type="button" id="loginBtn">로그인</button>
+        <div>
+            <button type="submit">닫기</button>
+            <button type="button" id="loginModalJoinBtn">회원가입</button>
+        </div>
+    </form>
+</dialog>
+
+<dialog class="modalContent" id="joinModal">
+    <form method="dialog"> 
+        <h3>회원가입</h3>
+        <input type="text" id="joinLoginIdInput" placeholder="아이디">
+        <input type="password" id="joinPasswordInput" placeholder="비밀번호">
+        <input type="text" id="joinNicknameInput" placeholder="닉네임">
+        <div id="joinErrorMsg"></div>
+        <button type="button" id="joinBtn">가입하기</button>
+        <div>
+            <button type="submit">닫기</button>
+        </div>
+    </form>
+</dialog>
+
+
+<script type="text/javascript" src="/js/modal.js"></script>
+<script type="text/javascript" src="/js/apiUtil.js"></script>
+<script>
+    const loginModal = document.getElementById('loginModal');
+    const joinModal = document.getElementById('joinModal');
+    
+    document.getElementById('openLoginModal').addEventListener('click', () => {
+        openModal(loginModal);
+    });
+
+    document.getElementById('openJoinModal').addEventListener('click', () => {
+        openModal(joinModal);
+    });
+   
+    document.getElementById('loginModalJoinBtn').addEventListener('click', () => {
+        loginModal.close();
+        openModal(joinModal);
+    });
+
+    document.getElementById('loginBtn').addEventListener('click', () => {
+        const errorDiv = document.getElementById('loginErrorMsg');
+        errorDiv.innerText = '';
+        
+        const loginData = {
+            loginId: document.getElementById('loginIdInput').value,
+            password: document.getElementById('passwordInput').value
+        };
+
+        requestPost('/login', loginData).then(result => {
+            if(result.isSuccess){
+                location.replace('/calendar');
+            }
+            else {
+                errorDiv.innerText = result.serverMessage;
+            }
+        });
+    });
+
+    document.getElementById('joinBtn').addEventListener('click', () => {
+        const errorDiv = document.getElementById('joinErrorMsg');
+        errorDiv.innerText = '';
+        
+        const joinData = {
+            loginId: document.getElementById('joinLoginIdInput').value,
+            password: document.getElementById('joinPasswordInput').value,
+            nickname: document.getElementById('joinNicknameInput').value
+        };
+
+        requestPost('/join', joinData).then(result => {
+            if(result.isSuccess){
+                location.replace('/');
+            }
+            else {
+                errorDiv.innerText = result.serverMessage;
+            }
+        });
+    });
+    
+</script>
+</body>
+</html>

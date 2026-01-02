@@ -25,4 +25,20 @@ public class GoalRequest {
         @NotNull(message = "마감일을 선택해주세요")
         private LocalDate dueDate;
     }
+
+    @Getter
+    @Setter
+    public static class Update {
+        @NotBlank(message = "할 일을 입력해주세요.")
+        private String task;
+
+        @NotNull(message = "구분을 선택해주세요.")
+        private GoalType type;
+
+        @NotNull(message = "시작일을 선택해주세요")
+        private LocalDate startDate;
+
+        @NotNull(message = "마감일을 선택해주세요")
+        private LocalDate dueDate;
+    }
 }
