@@ -8,8 +8,11 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.Map;
 
 @Controller
 public class UserController {
@@ -20,20 +23,30 @@ public class UserController {
         this.userService = userService;
     }
 
+    @GetMapping("/join")
+    public String joinGetRedirect() {
+        return "redirect:/";
+    }
+
     @PostMapping("/join")
-    public ResponseEntity<String> join(@Valid @RequestBody UserRequest.Join request) {
+    public ResponseEntity<?> join(@Valid @RequestBody UserRequest.Join request) {
         userService.join(request);
-        return ResponseEntity.ok("회원가입이 완료되었습니다!");
+        return ResponseEntity.ok(Map.of("message", "회원가입이 완료되었습니다!"));
+    }
+
+    @GetMapping("/login")
+    public String loginGetRedirect() {
+        return "redirect:/";
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@Valid @RequestBody UserRequest.Login request, HttpServletRequest httpServletRequest) {
+    public ResponseEntity<?> login(@Valid @RequestBody UserRequest.Login request, HttpServletRequest httpServletRequest) {
         User loginUser = userService.login(request);
 
         HttpSession session = httpServletRequest.getSession();
         session.setAttribute("loginUser", loginUser);
 
-        return ResponseEntity.ok("로그인 성공");
+        return ResponseEntity.ok(Map.of("message", "로그인 성공"));
     }
 
 }

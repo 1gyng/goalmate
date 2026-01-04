@@ -7,10 +7,11 @@ function requestPost(url, data) {
         body: JSON.stringify(data)
     })
     .then(response => {
-        return response.text().then(msg => {
+        return response.json().then(data => {
             return {
                 isSuccess: response.ok,
-                serverMessage: msg     
+                status: response.status,
+                serverMessage: data.message
             };
         });
     });

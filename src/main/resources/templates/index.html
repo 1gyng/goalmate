@@ -89,6 +89,7 @@
 
         requestPost('/join', joinData).then(result => {
             if(result.isSuccess){
+                alert(result.serverMessage)
                 location.replace('/');
             }
             else {
