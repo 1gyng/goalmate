@@ -5,9 +5,62 @@
     <title>Goal Mate</title>
     <link th:href="@{/css/common.css}" href="../css/common.css" rel="stylesheet">
     <link th:href="@{/css/modal.css}" href="../css/modal.css" rel="stylesheet">
+    <link th:href="@{/css/calendar.css}" href="../css/calendar.css" rel="stylesheet">
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.20/index.global.min.js'></script>
+    <script>
+        let selectedDate = '';
+        document.addEventListener('DOMContentLoaded', function() {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                customButtons: {
+                    addGoalButton: {
+                        text: '추가',
+                        click: function() {
+                            selectedDate = '';
+                            document.querySelector('input[value="DAILY"]').checked = true;
+                            document.getElementById('startDateInput').value = '';
+                            document.getElementById('dueDateInput').value = '';
+                            openModal(document.getElementById('addGoalModal'));
+                        }
+                    }
+                },
+                headerToolbar: {
+                    left: 'prev,next today addGoalButton',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,listWeek'
+                },
+                handleWindowResize: true,
+                aspectRatio: 1.5,
+                nowIndicator: true,
+                editable: true,
+                locale: 'ko',
+                buttonText: {
+                    today: '오늘',
+                    month: '월간',
+                    week: '주간',
+                    day: '일간',
+                    list: '목록'
+                },
+                dateClick: function(info) {
+                    selectedDate = info.dateStr;
+                    document.getElementById('startDateInput').value = selectedDate;
+                    document.querySelector('input[value="DAILY"]').checked = true;
+                    
+                    const event = new Event('change');
+                    document.getElementById('startDateInput').dispatchEvent(event);
+                    
+                    openModal(document.getElementById('addGoalModal'));
+                }
+            });
+            calendar.render();
+        });
+    </script>
 </head>
 <body>
-<button id="openAddGoalModal">추가</button>
+
+<div id="calendarContainer">
+    <div id='calendar'></div>
+</div>
 
 <dialog class="modalContent" id="addGoalModal">
     <form method="dialog"> 
@@ -29,7 +82,7 @@
         <input type="date" id="startDateInput">
 
         <label for="dueDateInput">종료일</label>
-        <input type="date" id="dueDateInput">
+        <input type="date" id="dueDateInput" readonly>
         <div>
             <button type="button" id="addGoalBtn">추가</button>
             <button type="submit">닫기</button>
@@ -39,19 +92,21 @@
 <script type="text/javascript" src="/js/modal.js"></script>
 <script type="text/javascript" src="/js/apiUtil.js"></script>
 <script>
-    const addGoalModal = document.getElementById('addGoalModal');
-
-    document.getElementById('openAddGoalModal').addEventListener('click', () => {
-        openModal(addGoalModal);
+    document.getElementById('startDateInput').addEventListener('input', e => {
+        selectedDate = e.target.value; 
     });
 
     document.getElementById('startDateInput').addEventListener('change', e => {
         const selectedType = document.querySelector('input[name="typeInput"]:checked').value;
         const dueDateInput = document.getElementById('dueDateInput');
-        let date = new Date(e.target.value);
+
+        if (!selectedDate) return;
+
+        let date = new Date(selectedDate);
 
         if(selectedType == 'DAILY') {
-            dueDateInput.value = e.target.value;
+            dueDateInput.value = selectedDate;
+            document.getElementById('startDateInput').value = dueDateInput.value;
         } else if(selectedType == 'WEEKLY') {
             const day = date.getDay();
             date.setDate(date.getDate() - day); //일요일
@@ -73,6 +128,17 @@
         } else {
             alert('유효한 선택이 아닙니다.');
         }
+    });
+
+    document.querySelectorAll('input[name="typeInput"]').forEach(input => {
+        input.addEventListener('change', () => {
+            const startDateInput = document.getElementById('startDateInput');
+            
+            if (startDateInput.value) {
+                const event = new Event('change');
+                startDateInput.dispatchEvent(event);
+            }
+        });
     });
 
     document.getElementById('addGoalBtn').addEventListener('click', () => {
