@@ -6,12 +6,15 @@ import com.gm.goalmate.domain.goal.GoalStatus;
 import com.gm.goalmate.domain.user.User;
 import com.gm.goalmate.domain.user.UserRepository;
 import com.gm.goalmate.dto.GoalRequest;
+import com.gm.goalmate.dto.GoalResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class GoalService {
@@ -24,7 +27,7 @@ public class GoalService {
     }
 
     @Transactional
-    public void addGoal(GoalRequest.Add request, Long userId) {
+    public GoalResponse.Goals addGoal(GoalRequest.Add request, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
 
@@ -52,6 +55,13 @@ public class GoalService {
                 .build();
 
         goalRepository.save(goal);
+
+        return GoalResponse.Goals.builder()
+                .id(goal.getGoalId())
+                .title(goal.getTask())
+                .start(goal.getStartDate())
+                .end(goal.getDueDate().plusDays(1))
+                .build();
     }
 
     @Transactional
@@ -68,5 +78,17 @@ public class GoalService {
 
     public void updateGoal(Long goalNum, GoalRequest.Update request) {
 
+    }
+
+    public List<GoalResponse.Goals> getGoalsByUserId(Long userId) {
+        List<Goal> goals = goalRepository.findAllByUserUserId(userId);
+        return goals.stream()
+                .map(goal -> GoalResponse.Goals.builder()
+                        .id(goal.getGoalId())
+                        .title(goal.getTask())
+                        .start(goal.getStartDate())
+                        .end(goal.getDueDate().plusDays(1))
+                        .build())
+                .collect(Collectors.toList());
     }
 }

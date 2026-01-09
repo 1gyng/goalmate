@@ -9,9 +9,10 @@
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.20/index.global.min.js'></script>
     <script>
         let selectedDate = '';
+        let calendar;
         document.addEventListener('DOMContentLoaded', function() {
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
+            const calendarEl = document.getElementById('calendar');
+            calendar = new FullCalendar.Calendar(calendarEl, {
                 customButtons: {
                     addGoalButton: {
                         text: '추가',
@@ -41,6 +42,7 @@
                     day: '일간',
                     list: '목록'
                 },
+                events: '/goals',
                 dateClick: function(info) {
                     selectedDate = info.dateStr;
                     document.getElementById('startDateInput').value = selectedDate;
@@ -150,10 +152,18 @@
         };
         
         requestPost('/goals', addGoalData).then(result => {
-            alert(result.serverMessage)
-
             if(result.isSuccess){
-                location.reload();
+                calendar.addEvent({
+                    id: result.data.id,
+                    title: result.data.title,
+                    start: result.data.start,
+                    end: result.data.end
+                });
+                document.getElementById('addGoalModal').close();
+                alert("목표가 추가되었습니다!");
+
+            } else {
+                alert(result.message);
             }
         });
     });

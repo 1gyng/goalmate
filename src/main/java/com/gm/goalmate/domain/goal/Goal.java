@@ -38,7 +38,7 @@ public class Goal {
     @Temporal(value = TemporalType.DATE)
     private LocalDate dueDate; //종료일
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
     private User user;
 
