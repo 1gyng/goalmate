@@ -27,68 +27,57 @@ public class GoalService {
     }
 
     @Transactional
-    public GoalResponse.Goals addGoal(GoalRequest.Add request, Long userId) {
+    public Long addGoal(GoalRequest.Add request, Long userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
-        if(request.getDueDate().isBefore(request.getStartDate())) {
-            throw new IllegalArgumentException("종료일은 시작일보다 빠를 수 없습니다.");
-        }
-
-        GoalStatus status;
-        LocalDate today = LocalDate.now();
-        if(today.isBefore(request.getStartDate())) {
-            status = GoalStatus.TODO;
-        } else if (today.isAfter(request.getDueDate())) {
-            status = GoalStatus.COMPLETED;
-        } else {
-            status = GoalStatus.IN_PROGRESS;
-        }
 
         Goal goal = Goal.builder()
                 .type(request.getType())
                 .task(request.getTask())
-                .status(status)
                 .startDate(request.getStartDate())
                 .dueDate(request.getDueDate())
                 .user(user)
+                .today(LocalDate.now())
                 .build();
 
-        goalRepository.save(goal);
-
-        return GoalResponse.Goals.builder()
-                .id(goal.getGoalId())
-                .title(goal.getTask())
-                .start(goal.getStartDate())
-                .end(goal.getDueDate().plusDays(1))
-                .build();
+        return goalRepository.save(goal).getGoalId();
     }
 
     @Transactional
     public void deleteGoal(Long goalNum, Long userId) {
-        Goal goal = goalRepository.findById(goalNum)
-                .orElseThrow(() -> new IllegalArgumentException("해당 목표를 찾을 수 없습니다."));
-
-        if(!goal.getUser().getUserId().equals(userId)) { //작성자 = 로그인한 사용자
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "권한이 없습니다.");
-        }
+        Goal goal = findGoalByGoalId(goalNum);
+        validateWriter(goal, userId);
 
         goalRepository.delete(goal);
     }
 
+    @Transactional
     public void updateGoal(Long goalNum, GoalRequest.Update request) {
-
+        Goal goal = findGoalByGoalId(goalNum);
+        goal.update(request);
     }
 
-    public List<GoalResponse.Goals> getGoalsByUserId(Long userId) {
+    public List<GoalResponse.SimpleInfo> getGoalsByUserId(Long userId) {
         List<Goal> goals = goalRepository.findAllByUserUserId(userId);
         return goals.stream()
-                .map(goal -> GoalResponse.Goals.builder()
+                .map(goal -> GoalResponse.SimpleInfo.builder()
                         .id(goal.getGoalId())
-                        .title(goal.getTask())
-                        .start(goal.getStartDate())
-                        .end(goal.getDueDate().plusDays(1))
+                        .task(goal.getTask())
+                        .startDate(goal.getStartDate())
+                        .dueDate(goal.getDueDate())
+                        .type(goal.getType())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    private Goal findGoalByGoalId(Long goalNum) {
+        return goalRepository.findById(goalNum)
+                .orElseThrow(() -> new IllegalArgumentException("해당 목표를 찾을 수 없습니다."));
+    }
+
+    private void validateWriter(Goal goal, Long userId) {
+        if(!goal.getUser().getUserId().equals(userId)) { //작성자 = 로그인한 사용자
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "권한이 없습니다.");
+        }
     }
 }

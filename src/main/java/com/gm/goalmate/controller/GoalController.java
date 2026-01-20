@@ -6,6 +6,7 @@ import com.gm.goalmate.dto.GoalRequest;
 import com.gm.goalmate.dto.GoalResponse;
 import com.gm.goalmate.service.GoalService;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -28,14 +29,15 @@ public class GoalController {
     }
 
     @GetMapping("/goals")
-    public @ResponseBody ResponseEntity<List<GoalResponse.Goals>> getGoalsByUserId(@LoginUser User user) {
-        List<GoalResponse.Goals> goals = goalService.getGoalsByUserId(user.getUserId());
+    public ResponseEntity<List<GoalResponse.SimpleInfo>> getGoalsByUserId(@LoginUser User user) {
+        List<GoalResponse.SimpleInfo> goals = goalService.getGoalsByUserId(user.getUserId());
         return ResponseEntity.ok(goals);
     }
 
     @PostMapping("/goals")
-    public ResponseEntity<GoalResponse.Goals> addGoal(@Valid @RequestBody GoalRequest.Add request, @LoginUser User user) {
-        return ResponseEntity.ok(goalService.addGoal(request, user.getUserId()));
+    public ResponseEntity<?> addGoal(@Valid @RequestBody GoalRequest.Add request, @LoginUser User user) {
+        Long goalId = goalService.addGoal(request, user.getUserId());
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("id", goalId,"message", "목표가 추가되었습니다!"));
     }
 
     @DeleteMapping("/goals/{goalNum}")

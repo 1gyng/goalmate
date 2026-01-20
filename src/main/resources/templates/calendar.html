@@ -18,9 +18,8 @@
                         text: '추가',
                         click: function() {
                             selectedDate = '';
+                            clearModalInput();
                             document.querySelector('input[value="DAILY"]').checked = true;
-                            document.getElementById('startDateInput').value = '';
-                            document.getElementById('dueDateInput').value = '';
                             openModal(document.getElementById('addGoalModal'));
                         }
                     }
@@ -42,8 +41,33 @@
                     day: '일간',
                     list: '목록'
                 },
-                events: '/goals',
+                events: function(info, successCallback, failureCallback) {
+                    fetch('/goals')
+                        .then(res => res.json())
+                        .then(data => {
+                            const goals = data.map(goal => {
+                                let dueDate = new Date(goal.dueDate);
+                                dueDate.setDate(dueDate.getDate() + 1);
+
+                                return {
+                                    id: goal.id,
+                                    title: goal.task,
+                                    start: goal.startDate,
+                                    end: dueDate.toLocaleDateString('en-CA'),
+                                    extendedProps: { 
+                                        type: goal.type 
+                                    }
+                                };
+                            });
+                            successCallback(goals);
+                        })
+                        .catch(error => {
+                            failureCallback(error);
+                        });
+                },
                 dateClick: function(info) {
+                    clearModalInput();
+
                     selectedDate = info.dateStr;
                     document.getElementById('startDateInput').value = selectedDate;
                     document.querySelector('input[value="DAILY"]').checked = true;
@@ -51,6 +75,22 @@
                     const event = new Event('change');
                     document.getElementById('startDateInput').dispatchEvent(event);
                     
+                    openModal(document.getElementById('addGoalModal'));
+                },
+                eventClick: function(info) {
+                    document.getElementById('goalIdInput').value = info.event.id;
+                    document.getElementById('startDateInput').value = info.event.startStr;
+                    document.getElementById('taskInput').value = info.event.title;
+
+                    let date = new Date(info.event.end);
+                    date.setDate(date.getDate() - 1);
+                    document.getElementById('dueDateInput').value = date.toLocaleDateString('en-CA');
+                    
+                    document.querySelectorAll('input[name="typeInput"]').forEach(input => {
+                        if(input.value === info.event.extendedProps.type)
+                            input.checked = true;
+                    });
+
                     openModal(document.getElementById('addGoalModal'));
                 }
             });
@@ -65,7 +105,7 @@
 </div>
 
 <dialog class="modalContent" id="addGoalModal">
-    <form method="dialog"> 
+    <form method="dialog" class="modalForm"> 
         <h3>새 목표 추가</h3>
         <div>
             <input type="radio" id="daily" name="typeInput" value="DAILY" checked>
@@ -85,6 +125,7 @@
 
         <label for="dueDateInput">종료일</label>
         <input type="date" id="dueDateInput" readonly>
+        <input type="hidden" id="goalIdInput">
         <div>
             <button type="button" id="addGoalBtn">추가</button>
             <button type="submit">닫기</button>
@@ -106,24 +147,24 @@
 
         let date = new Date(selectedDate);
 
-        if(selectedType == 'DAILY') {
+        if(selectedType === 'DAILY') {
             dueDateInput.value = selectedDate;
             document.getElementById('startDateInput').value = dueDateInput.value;
-        } else if(selectedType == 'WEEKLY') {
+        } else if(selectedType === 'WEEKLY') {
             const day = date.getDay();
             date.setDate(date.getDate() - day); //일요일
             e.target.value = date.toLocaleDateString('en-CA');
 
             date.setDate(date.getDate() + 6); //토요일
             dueDateInput.value = date.toLocaleDateString('en-CA');
-        } else if(selectedType == 'MONTHLY') {
+        } else if(selectedType === 'MONTHLY') {
             date.setDate(1);
             e.target.value = date.toLocaleDateString('en-CA');
 
             date.setMonth(date.getMonth()+1);
             date.setDate(0);
             dueDateInput.value = date.toLocaleDateString('en-CA');
-        } else if(selectedType == 'YEARLY') {
+        } else if(selectedType === 'YEARLY') {
             const year = e.target.value.split('-')[0];
             e.target.value = `${year}-01-01`;
             dueDateInput.value = `${year}-12-31`;
@@ -153,18 +194,10 @@
         
         requestPost('/goals', addGoalData).then(result => {
             if(result.isSuccess){
-                calendar.addEvent({
-                    id: result.data.id,
-                    title: result.data.title,
-                    start: result.data.start,
-                    end: result.data.end
-                });
+                calendar.refetchEvents();
                 document.getElementById('addGoalModal').close();
-                alert("목표가 추가되었습니다!");
-
-            } else {
-                alert(result.message);
             }
+            alert(result.message);
         });
     });
 
