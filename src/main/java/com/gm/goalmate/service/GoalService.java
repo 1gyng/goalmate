@@ -8,6 +8,7 @@ import com.gm.goalmate.domain.user.UserRepository;
 import com.gm.goalmate.dto.GoalRequest;
 import com.gm.goalmate.dto.GoalResponse;
 import org.springframework.http.HttpStatus;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -68,6 +69,15 @@ public class GoalService {
                         .type(goal.getType())
                         .build())
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    @Scheduled(cron = "0 0 0 * * *") // 매일 0시 0분 0초(자정)에 실행
+    public void updateStatus() {
+        LocalDate today = LocalDate.now();
+        goalRepository.updateStatusToTodo(today);
+        goalRepository.updateStatusToInProgress(today);
+        goalRepository.updateStatusToCompleted(today);
     }
 
     private Goal findGoalByGoalId(Long goalNum) {
