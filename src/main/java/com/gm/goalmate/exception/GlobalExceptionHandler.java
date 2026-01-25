@@ -36,4 +36,9 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleResponseStatusException(ResponseStatusException e) {
         return createResponseEntity(e.getStatusCode(), e.getReason());
     }
+
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalStateException(IllegalStateException e) {
+        return createResponseEntity(HttpStatus.BAD_REQUEST, e.getMessage());
+    }
 }

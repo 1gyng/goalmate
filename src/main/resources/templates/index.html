@@ -11,11 +11,11 @@
 <h2>Goal Mate에 대한 소개...</h2>
 
 <dialog class="modalContent" id="loginModal">
-    <form method="dialog"> 
+    <form method="dialog" class="modalForm"> 
         <h3>로그인</h3>
         <input type="text" id="loginIdInput" placeholder="아이디">
         <input type="password" id="passwordInput" placeholder="비밀번호">
-        <div id="loginErrorMsg"></div>
+        <div id="loginErrorMsg" class="errorMsg"></div>
         <button type="button" id="loginBtn">로그인</button>
         <div>
             <button type="submit">닫기</button>
@@ -25,12 +25,13 @@
 </dialog>
 
 <dialog class="modalContent" id="joinModal">
-    <form method="dialog"> 
+    <form method="dialog" class="modalForm">
         <h3>회원가입</h3>
         <input type="text" id="joinLoginIdInput" placeholder="아이디">
+        <button type="button" id="loginIdCheckBtn">중복확인</button>
         <input type="password" id="joinPasswordInput" placeholder="비밀번호">
         <input type="text" id="joinNicknameInput" placeholder="닉네임">
-        <div id="joinErrorMsg"></div>
+        <div id="joinErrorMsg" class="errorMsg"></div>
         <button type="button" id="joinBtn">가입하기</button>
         <div>
             <button type="submit">닫기</button>
@@ -60,8 +61,7 @@
 
     document.getElementById('loginBtn').addEventListener('click', () => {
         const errorDiv = document.getElementById('loginErrorMsg');
-        errorDiv.innerText = '';
-        
+
         const loginData = {
             loginId: document.getElementById('loginIdInput').value,
             password: document.getElementById('passwordInput').value
@@ -79,8 +79,7 @@
 
     document.getElementById('joinBtn').addEventListener('click', () => {
         const errorDiv = document.getElementById('joinErrorMsg');
-        errorDiv.innerText = '';
-        
+
         const joinData = {
             loginId: document.getElementById('joinLoginIdInput').value,
             password: document.getElementById('joinPasswordInput').value,
@@ -97,7 +96,33 @@
             }
         });
     });
-    
+
+    document.getElementById('loginIdCheckBtn').addEventListener('click', async () => {
+        const loginIdInput = document.getElementById('joinLoginIdInput');
+        const errorDiv = document.getElementById('joinErrorMsg');
+
+        if(!loginIdInput.value.trim()) {
+            errorDiv.innerText = "아이디를 입력해주세요.";
+            return;
+        }
+        
+        try {
+            const response = await fetch(`/join/check-id/${loginIdInput.value}`);
+            const data = await response.json();
+
+            if((!response.ok)) {
+                throw new Error(data.message);
+            }
+
+            alert(data.message);
+            loginIdInput.readOnly = true;
+            loginIdInput.style.backgroundColor = '#e9ecef';
+        }
+        catch (error) {
+            errorDiv.innerText = error.message;
+        }
+    });
+
 </script>
 </body>
 </html>

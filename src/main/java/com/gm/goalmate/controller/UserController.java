@@ -2,6 +2,7 @@ package com.gm.goalmate.controller;
 
 import com.gm.goalmate.domain.user.User;
 import com.gm.goalmate.dto.UserRequest;
+import com.gm.goalmate.dto.UserResponse;
 import com.gm.goalmate.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
@@ -9,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
@@ -49,4 +51,9 @@ public class UserController {
         return ResponseEntity.ok(Map.of("message", "로그인 성공"));
     }
 
+    @GetMapping("/join/check-id/{loginId}")
+    public ResponseEntity<UserResponse.LoginIdCheck> checkLoginId(@PathVariable String loginId) {
+        UserResponse.LoginIdCheck loginIdCheck = userService.checkLoginId(loginId);
+        return ResponseEntity.ok(loginIdCheck);
+    }
 }

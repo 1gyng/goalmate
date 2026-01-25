@@ -3,6 +3,7 @@ package com.gm.goalmate.service;
 import com.gm.goalmate.domain.user.User;
 import com.gm.goalmate.domain.user.UserRepository;
 import com.gm.goalmate.dto.UserRequest;
+import com.gm.goalmate.dto.UserResponse;
 import jakarta.validation.Valid;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -42,5 +43,13 @@ public class UserService {
         }
 
         return user;
+    }
+
+    public UserResponse.LoginIdCheck checkLoginId(String loginId) {
+        if(userRepository.existsByLoginId(loginId)) {
+            throw new IllegalStateException("사용할 수 없는 아이디입니다.");
+        }
+
+        return new UserResponse.LoginIdCheck(loginId, "사용할 수 있는 아이디입니다.");
     }
 }
