@@ -52,4 +52,10 @@ public class GoalController {
         return ResponseEntity.ok(Map.of("message", "목표가 수정되었습니다!"));
     }
 
+    @PatchMapping("/goals/{goalNum}/status")
+    public void updateGoalStatus(@PathVariable Long goalNum, @Valid @RequestBody GoalRequest.UpdateStatus request) {
+
+
+    }
+
 }

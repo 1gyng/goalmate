@@ -69,7 +69,7 @@ public class Goal {
 
     public GoalStatus determineStatus(LocalDate today) {
         if(today.isBefore(this.startDate)) {
-            return GoalStatus.TODO;
+            return GoalStatus.PLANNED;
         } else if (today.isAfter(this.dueDate)) {
             return GoalStatus.COMPLETED;
         } else {

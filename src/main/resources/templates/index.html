@@ -1,8 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
     <title>Goal Mate</title>
+    <link th:href="@{/css/common.css}" href="../css/common.css" rel="stylesheet">
+    <link th:href="@{/css/modal.css}" href="../css/modal.css" rel="stylesheet">
 </head>
 <body>
 <button id="openLoginModal">로그인</button>
@@ -115,6 +117,7 @@
             }
 
             alert(data.message);
+            loginIdInput.value = data.loginId;
             loginIdInput.readOnly = true;
             loginIdInput.style.backgroundColor = '#e9ecef';
         }
