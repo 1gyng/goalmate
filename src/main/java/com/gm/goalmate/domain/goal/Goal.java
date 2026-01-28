@@ -61,6 +61,16 @@ public class Goal {
         this.dueDate = request.getDueDate();
     }
 
+    public void updateStatus(GoalRequest.UpdateStatus request) {
+        GoalStatus status = request.getStatus();
+
+        if(status != GoalStatus.SUCCESS && status != GoalStatus.FAILED) {
+            throw new IllegalArgumentException("달성 또는 미달성만 가능합니다.");
+        }
+
+        this.status = request.getStatus();
+    }
+
     private void validateDateRange(LocalDate startDate, LocalDate dueDate) {
         if(dueDate.isBefore(startDate)) {
             throw new IllegalArgumentException("종료일은 시작일보다 빠를 수 없습니다.");

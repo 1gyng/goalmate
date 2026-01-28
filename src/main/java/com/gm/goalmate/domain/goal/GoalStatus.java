@@ -9,8 +9,8 @@ public enum GoalStatus {
     PLANNED("예정"),
     IN_PROGRESS("진행중"),
     COMPLETED("완료"),
-    SUCCESS("성공"),
-    FAILED("실패");
+    SUCCESS("달성"),
+    FAILED("미달성");
 
     private final String description;
 }

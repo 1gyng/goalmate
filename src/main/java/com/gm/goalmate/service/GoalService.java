@@ -7,6 +7,7 @@ import com.gm.goalmate.domain.user.User;
 import com.gm.goalmate.domain.user.UserRepository;
 import com.gm.goalmate.dto.GoalRequest;
 import com.gm.goalmate.dto.GoalResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -78,6 +79,17 @@ public class GoalService {
         goalRepository.updateStatusToTodo(today);
         goalRepository.updateStatusToInProgress(today);
         goalRepository.updateStatusToCompleted(today);
+    }
+
+    @Transactional
+    public String updateGoalStatus(Long goalNum, GoalRequest.UpdateStatus request) {
+        Goal goal = findGoalByGoalId(goalNum);
+        goal.updateStatus(request);
+
+        if(goal.getStatus() == GoalStatus.SUCCESS) {
+            return "목표 달성! 다음 목표도 파이팅 해봐요✨";
+        } else
+            return "저장 완료. 이번의 아쉬움은 다음에 채워봐요💪";
     }
 
     private Goal findGoalByGoalId(Long goalNum) {

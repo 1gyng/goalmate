@@ -53,9 +53,9 @@ public class GoalController {
     }
 
     @PatchMapping("/goals/{goalNum}/status")
-    public void updateGoalStatus(@PathVariable Long goalNum, @Valid @RequestBody GoalRequest.UpdateStatus request) {
-
-
+    public ResponseEntity<?> updateGoalStatus(@PathVariable Long goalNum, @Valid @RequestBody GoalRequest.UpdateStatus request) {
+        String msg = goalService.updateGoalStatus(goalNum, request);
+        return ResponseEntity.ok(Map.of("message", msg));
     }
 
 }
