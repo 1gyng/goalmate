@@ -1,5 +1,7 @@
 package com.gm.goalmate.dto;
 
+import com.gm.goalmate.domain.goal.GoalResult;
+import com.gm.goalmate.domain.goal.GoalStatus;
 import com.gm.goalmate.domain.goal.GoalType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -40,5 +42,12 @@ public class GoalRequest {
 
         @NotNull(message = "마감일을 선택해주세요")
         private LocalDate dueDate;
+    }
+
+    @Getter
+    @Setter
+    public static class UpdateResult {
+        @NotNull(message = "결과를 선택해주세요.")
+        private GoalResult result;
     }
 }

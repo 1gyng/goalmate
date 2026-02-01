@@ -2,11 +2,13 @@ package com.gm.goalmate.service;
 
 import com.gm.goalmate.domain.goal.Goal;
 import com.gm.goalmate.domain.goal.GoalRepository;
+import com.gm.goalmate.domain.goal.GoalResult;
 import com.gm.goalmate.domain.goal.GoalStatus;
 import com.gm.goalmate.domain.user.User;
 import com.gm.goalmate.domain.user.UserRepository;
 import com.gm.goalmate.dto.GoalRequest;
 import com.gm.goalmate.dto.GoalResponse;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -78,6 +80,17 @@ public class GoalService {
         goalRepository.updateStatusToTodo(today);
         goalRepository.updateStatusToInProgress(today);
         goalRepository.updateStatusToCompleted(today);
+    }
+
+    @Transactional
+    public String updateGoalResult(Long goalNum, GoalRequest.UpdateResult request) {
+        Goal goal = findGoalByGoalId(goalNum);
+        goal.updateResult(request);
+
+        if(goal.getResult() == GoalResult.SUCCESS) {
+            return "목표 달성! 다음 목표도 파이팅 해봐요✨";
+        } else
+            return "저장 완료. 이번의 아쉬움은 다음에 채워봐요💪";
     }
 
     private Goal findGoalByGoalId(Long goalNum) {
