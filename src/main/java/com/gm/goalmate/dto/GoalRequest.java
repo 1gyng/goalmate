@@ -1,5 +1,6 @@
 package com.gm.goalmate.dto;
 
+import com.gm.goalmate.domain.goal.GoalResult;
 import com.gm.goalmate.domain.goal.GoalStatus;
 import com.gm.goalmate.domain.goal.GoalType;
 import jakarta.validation.constraints.NotBlank;
@@ -45,8 +46,8 @@ public class GoalRequest {
 
     @Getter
     @Setter
-    public static class UpdateStatus {
+    public static class UpdateResult {
         @NotNull(message = "결과를 선택해주세요.")
-        private GoalStatus status;
+        private GoalResult result;
     }
 }

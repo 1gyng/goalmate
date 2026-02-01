@@ -30,6 +30,10 @@ public class Goal {
     @Column(nullable = false)
     private GoalStatus status;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private GoalResult result = GoalResult.NONE;
+
     @Column(nullable = false)
     @Temporal(value = TemporalType.DATE)
     private LocalDate startDate; //시작일
@@ -61,14 +65,14 @@ public class Goal {
         this.dueDate = request.getDueDate();
     }
 
-    public void updateStatus(GoalRequest.UpdateStatus request) {
-        GoalStatus status = request.getStatus();
+    public void updateResult(GoalRequest.UpdateResult request) {
+        GoalResult result = request.getResult();
 
-        if(status != GoalStatus.SUCCESS && status != GoalStatus.FAILED) {
+        if(result != GoalResult.SUCCESS && result != GoalResult.FAILED) {
             throw new IllegalArgumentException("달성 또는 미달성만 가능합니다.");
         }
 
-        this.status = request.getStatus();
+        this.result = request.getResult();
     }
 
     private void validateDateRange(LocalDate startDate, LocalDate dueDate) {
@@ -81,7 +85,7 @@ public class Goal {
         if(today.isBefore(this.startDate)) {
             return GoalStatus.PLANNED;
         } else if (today.isAfter(this.dueDate)) {
-            return GoalStatus.COMPLETED;
+            return GoalStatus.ENDED;
         } else {
             return GoalStatus.IN_PROGRESS;
         }

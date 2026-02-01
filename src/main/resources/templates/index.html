@@ -5,6 +5,8 @@
     <title>Goal Mate</title>
     <link th:href="@{/css/common.css}" href="../css/common.css" rel="stylesheet">
     <link th:href="@{/css/modal.css}" href="../css/modal.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
 <body>
 <button id="openLoginModal">로그인</button>
@@ -12,32 +14,52 @@
 
 <h2>Goal Mate에 대한 소개...</h2>
 
-<dialog class="modalContent" id="loginModal">
-    <form method="dialog" class="modalForm"> 
-        <h3>로그인</h3>
-        <input type="text" id="loginIdInput" placeholder="아이디">
-        <input type="password" id="passwordInput" placeholder="비밀번호">
-        <div id="loginErrorMsg" class="errorMsg"></div>
-        <button type="button" id="loginBtn">로그인</button>
-        <div>
-            <button type="submit">닫기</button>
-            <button type="button" id="loginModalJoinBtn">회원가입</button>
-        </div>
+<dialog id="loginModal" class="modal">
+    <div class="modal-box !max-w-sm rounded-2xl">
+        <form method="dialog" class="modalForm flex flex-col gap-4">
+            <h2 class="text-center text-primary">로그인</h2>
+
+            <input type="text" id="loginIdInput" class="input input-bordered rounded-xl input-primary w-full" placeholder="아이디">
+            <div class="flex flex-col">
+                <input type="password" id="passwordInput" class="input input-bordered rounded-xl input-primary w-full" placeholder="비밀번호">
+                <div id="loginErrorMsg" class="errorMsg text-error text-sm min-h-[1.25rem] mt-1 font-semibold"></div>
+            </div>
+            <button type="button" id="loginBtn" class="btn btn-outline rounded-xl btn-primary w-full">로그인</button>
+            <div class="flex justify-between gap-2">
+                <button type="submit" class="btn p-0 btn-link no-underline text-base-content/60 hover:underline">닫기</button>
+                <button type="button" id="loginModalJoinBtn" class="btn p-0 btn-link no-underline hover:underline">회원가입</button>
+            </div>
+        </form>
+    </div>   
+
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
     </form>
 </dialog>
 
-<dialog class="modalContent" id="joinModal">
-    <form method="dialog" class="modalForm">
-        <h3>회원가입</h3>
-        <input type="text" id="joinLoginIdInput" placeholder="아이디">
-        <button type="button" id="loginIdCheckBtn">중복확인</button>
-        <input type="password" id="joinPasswordInput" placeholder="비밀번호">
-        <input type="text" id="joinNicknameInput" placeholder="닉네임">
-        <div id="joinErrorMsg" class="errorMsg"></div>
-        <button type="button" id="joinBtn">가입하기</button>
-        <div>
-            <button type="submit">닫기</button>
-        </div>
+<dialog class="modal" id="joinModal">
+    <div class="modal-box !max-w-sm rounded-2xl">
+        <form method="dialog" class="modalForm flex flex-col gap-4">
+            <h2 class="text-center text-primary">회원가입</h2>
+            <div class="flex w-full gap-2">
+                <input type="text" id="joinLoginIdInput" class="input input-bordered input-primary rounded-xl grow" placeholder="아이디">
+                <button type="button" id="loginIdCheckBtn" class="btn btn-outline btn-primary rounded-xl">중복확인</button>
+            </div>
+            <input type="password" id="joinPasswordInput" class="input input-bordered rounded-xl input-primary w-full" placeholder="비밀번호">
+            <div>
+                <input type="text" id="joinNicknameInput" class="input input-bordered rounded-xl input-primary w-full" placeholder="닉네임">
+                <div id="joinErrorMsg" class="errorMsg text-error text-sm min-h-[1.25rem] mt-1 font-semibold"></div>
+            </div>
+
+            <button type="button" id="joinBtn" class="btn btn-outline rounded-xl btn-primary w-full">가입하기</button>
+            <div class="flex">
+                <button type="submit" class="btn p-0 btn-link no-underline text-base-content/60 hover:underline">닫기</button>
+            </div>
+        </form>
+    </div>
+
+    <form method="dialog" class="modal-backdrop">
+        <button>close</button>
     </form>
 </dialog>
 

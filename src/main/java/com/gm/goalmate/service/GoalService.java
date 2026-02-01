@@ -2,6 +2,7 @@ package com.gm.goalmate.service;
 
 import com.gm.goalmate.domain.goal.Goal;
 import com.gm.goalmate.domain.goal.GoalRepository;
+import com.gm.goalmate.domain.goal.GoalResult;
 import com.gm.goalmate.domain.goal.GoalStatus;
 import com.gm.goalmate.domain.user.User;
 import com.gm.goalmate.domain.user.UserRepository;
@@ -82,11 +83,11 @@ public class GoalService {
     }
 
     @Transactional
-    public String updateGoalStatus(Long goalNum, GoalRequest.UpdateStatus request) {
+    public String updateGoalResult(Long goalNum, GoalRequest.UpdateResult request) {
         Goal goal = findGoalByGoalId(goalNum);
-        goal.updateStatus(request);
+        goal.updateResult(request);
 
-        if(goal.getStatus() == GoalStatus.SUCCESS) {
+        if(goal.getResult() == GoalResult.SUCCESS) {
             return "목표 달성! 다음 목표도 파이팅 해봐요✨";
         } else
             return "저장 완료. 이번의 아쉬움은 다음에 채워봐요💪";

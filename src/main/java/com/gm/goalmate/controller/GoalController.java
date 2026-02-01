@@ -28,6 +28,11 @@ public class GoalController {
         return "calendar";
     }
 
+    @GetMapping("/list")
+    public String showList() {
+        return "goal-list";
+    }
+
     @GetMapping("/goals")
     public ResponseEntity<List<GoalResponse.SimpleInfo>> getGoalsByUserId(@LoginUser User user) {
         List<GoalResponse.SimpleInfo> goals = goalService.getGoalsByUserId(user.getUserId());
@@ -52,9 +57,9 @@ public class GoalController {
         return ResponseEntity.ok(Map.of("message", "목표가 수정되었습니다!"));
     }
 
-    @PatchMapping("/goals/{goalNum}/status")
-    public ResponseEntity<?> updateGoalStatus(@PathVariable Long goalNum, @Valid @RequestBody GoalRequest.UpdateStatus request) {
-        String msg = goalService.updateGoalStatus(goalNum, request);
+    @PatchMapping("/goals/{goalNum}/result")
+    public ResponseEntity<?> updateGoalStatus(@PathVariable Long goalNum, @Valid @RequestBody GoalRequest.UpdateResult request) {
+        String msg = goalService.updateGoalResult(goalNum, request);
         return ResponseEntity.ok(Map.of("message", msg));
     }
 

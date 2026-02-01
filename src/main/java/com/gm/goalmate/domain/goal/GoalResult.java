@@ -5,10 +5,10 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public enum GoalStatus {
-    PLANNED("예정"),
-    IN_PROGRESS("진행중"),
-    ENDED("종료");
+public enum GoalResult {
+    NONE("미선택"),
+    SUCCESS("달성"),
+    FAILED("미달성");
 
     private final String description;
 }
