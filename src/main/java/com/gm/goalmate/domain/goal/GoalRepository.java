@@ -22,4 +22,6 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
     @Modifying
     @Query(value = "UPDATE Goal g SET g.status = 'COMPLETED' WHERE g.dueDate < :today AND g.status != 'COMPLETED'")
     void updateStatusToCompleted(@Param("today") LocalDate today);
+
+    List<Goal> findAllByUserUserIdAndStartDateBetweenAndType(Long userId, LocalDate startDate, LocalDate dueDate, GoalType type);
 }

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Goal Mate</title>
@@ -8,146 +9,158 @@
     <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css" />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
+
 <body>
-<button id="openLoginModal">로그인</button>
-<button id="openJoinModal">회원가입</button>
+    <button id="openLoginModal">로그인</button>
+    <button id="openJoinModal">회원가입</button>
 
-<h2>Goal Mate에 대한 소개...</h2>
+    <h2>Goal Mate에 대한 소개...</h2>
 
-<dialog id="loginModal" class="modal">
-    <div class="modal-box !max-w-sm rounded-2xl">
-        <form method="dialog" class="modalForm flex flex-col gap-4">
-            <h2 class="text-center text-primary">로그인</h2>
+    <dialog id="loginModal" class="modal">
+        <div class="modal-box !max-w-sm rounded-2xl">
+            <form method="dialog" class="modalForm flex flex-col gap-4">
+                <h2 class="text-center text-primary">로그인</h2>
 
-            <input type="text" id="loginIdInput" class="input input-bordered rounded-xl input-primary w-full" placeholder="아이디">
-            <div class="flex flex-col">
-                <input type="password" id="passwordInput" class="input input-bordered rounded-xl input-primary w-full" placeholder="비밀번호">
-                <div id="loginErrorMsg" class="errorMsg text-error text-sm min-h-[1.25rem] mt-1 font-semibold"></div>
-            </div>
-            <button type="button" id="loginBtn" class="btn btn-outline rounded-xl btn-primary w-full">로그인</button>
-            <div class="flex justify-between gap-2">
-                <button type="submit" class="btn p-0 btn-link no-underline text-base-content/60 hover:underline">닫기</button>
-                <button type="button" id="loginModalJoinBtn" class="btn p-0 btn-link no-underline hover:underline">회원가입</button>
-            </div>
+                <input type="text" id="loginIdInput" class="input input-bordered rounded-xl input-primary w-full"
+                    placeholder="아이디">
+                <div class="flex flex-col">
+                    <input type="password" id="passwordInput"
+                        class="input input-bordered rounded-xl input-primary w-full" placeholder="비밀번호">
+                    <div id="loginErrorMsg" class="errorMsg text-error text-sm min-h-[1.25rem] mt-1 font-semibold">
+                    </div>
+                </div>
+                <button type="button" id="loginBtn" class="btn btn-outline rounded-xl btn-primary w-full">로그인</button>
+                <div class="flex justify-between gap-2">
+                    <button type="submit"
+                        class="btn p-0 btn-link no-underline text-base-content/60 hover:underline">닫기</button>
+                    <button type="button" id="loginModalJoinBtn"
+                        class="btn p-0 btn-link no-underline hover:underline">회원가입</button>
+                </div>
+            </form>
+        </div>
+
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
         </form>
-    </div>   
+    </dialog>
 
-    <form method="dialog" class="modal-backdrop">
-        <button>close</button>
-    </form>
-</dialog>
+    <dialog class="modal" id="joinModal">
+        <div class="modal-box !max-w-sm rounded-2xl">
+            <form method="dialog" class="modalForm flex flex-col gap-4">
+                <h2 class="text-center text-primary">회원가입</h2>
+                <div class="flex w-full gap-2">
+                    <input type="text" id="joinLoginIdInput" class="input input-bordered input-primary rounded-xl grow"
+                        placeholder="아이디">
+                    <button type="button" id="loginIdCheckBtn"
+                        class="btn btn-outline btn-primary rounded-xl">중복확인</button>
+                </div>
+                <input type="password" id="joinPasswordInput"
+                    class="input input-bordered rounded-xl input-primary w-full" placeholder="비밀번호">
+                <div>
+                    <input type="text" id="joinNicknameInput"
+                        class="input input-bordered rounded-xl input-primary w-full" placeholder="닉네임">
+                    <div id="joinErrorMsg" class="errorMsg text-error text-sm min-h-[1.25rem] mt-1 font-semibold"></div>
+                </div>
 
-<dialog class="modal" id="joinModal">
-    <div class="modal-box !max-w-sm rounded-2xl">
-        <form method="dialog" class="modalForm flex flex-col gap-4">
-            <h2 class="text-center text-primary">회원가입</h2>
-            <div class="flex w-full gap-2">
-                <input type="text" id="joinLoginIdInput" class="input input-bordered input-primary rounded-xl grow" placeholder="아이디">
-                <button type="button" id="loginIdCheckBtn" class="btn btn-outline btn-primary rounded-xl">중복확인</button>
-            </div>
-            <input type="password" id="joinPasswordInput" class="input input-bordered rounded-xl input-primary w-full" placeholder="비밀번호">
-            <div>
-                <input type="text" id="joinNicknameInput" class="input input-bordered rounded-xl input-primary w-full" placeholder="닉네임">
-                <div id="joinErrorMsg" class="errorMsg text-error text-sm min-h-[1.25rem] mt-1 font-semibold"></div>
-            </div>
+                <button type="button" id="joinBtn" class="btn btn-outline rounded-xl btn-primary w-full">가입하기</button>
+                <div class="flex">
+                    <button type="submit"
+                        class="btn p-0 btn-link no-underline text-base-content/60 hover:underline">닫기</button>
+                </div>
+            </form>
+        </div>
 
-            <button type="button" id="joinBtn" class="btn btn-outline rounded-xl btn-primary w-full">가입하기</button>
-            <div class="flex">
-                <button type="submit" class="btn p-0 btn-link no-underline text-base-content/60 hover:underline">닫기</button>
-            </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
         </form>
-    </div>
-
-    <form method="dialog" class="modal-backdrop">
-        <button>close</button>
-    </form>
-</dialog>
+    </dialog>
 
 
-<script type="text/javascript" src="/js/modal.js"></script>
-<script type="text/javascript" src="/js/apiUtil.js"></script>
-<script>
-    const loginModal = document.getElementById('loginModal');
-    const joinModal = document.getElementById('joinModal');
-    
-    document.getElementById('openLoginModal').addEventListener('click', () => {
-        openModal(loginModal);
-    });
+    <script type="text/javascript" src="/js/modal.js"></script>
+    <script type="text/javascript" src="/js/apiUtil.js"></script>
+    <script>
+        const loginModal = document.getElementById('loginModal');
+        const joinModal = document.getElementById('joinModal');
 
-    document.getElementById('openJoinModal').addEventListener('click', () => {
-        openModal(joinModal);
-    });
-   
-    document.getElementById('loginModalJoinBtn').addEventListener('click', () => {
-        loginModal.close();
-        openModal(joinModal);
-    });
+        document.getElementById('openLoginModal').addEventListener('click', () => {
+            openModal(loginModal);
+        });
 
-    document.getElementById('loginBtn').addEventListener('click', () => {
-        const errorDiv = document.getElementById('loginErrorMsg');
+        document.getElementById('openJoinModal').addEventListener('click', () => {
+            openModal(joinModal);
+        });
 
-        const loginData = {
-            loginId: document.getElementById('loginIdInput').value,
-            password: document.getElementById('passwordInput').value
-        };
+        document.getElementById('loginModalJoinBtn').addEventListener('click', () => {
+            loginModal.close();
+            openModal(joinModal);
+        });
 
-        requestPost('/login', loginData).then(result => {
-            if(result.isSuccess){
-                location.replace('/calendar');
+        document.getElementById('loginBtn').addEventListener('click', () => {
+            const errorDiv = document.getElementById('loginErrorMsg');
+
+            const loginData = {
+                loginId: document.getElementById('loginIdInput').value,
+                password: document.getElementById('passwordInput').value
+            };
+
+            requestPost('/login', loginData).then(result => {
+                if (result.isSuccess) {
+                    location.replace('/calendar');
+                }
+                else {
+                    errorDiv.innerText = result.message;
+                }
+            });
+        });
+
+        document.getElementById('joinBtn').addEventListener('click', () => {
+            const errorDiv = document.getElementById('joinErrorMsg');
+
+            const joinData = {
+                loginId: document.getElementById('joinLoginIdInput').value,
+                password: document.getElementById('joinPasswordInput').value,
+                nickname: document.getElementById('joinNicknameInput').value
+            };
+
+            requestPost('/join', joinData).then(result => {
+                if (result.isSuccess) {
+                    alert(result.message)
+                    location.replace('/');
+                }
+                else {
+                    errorDiv.innerText = result.message;
+                }
+            });
+        });
+
+        document.getElementById('loginIdCheckBtn').addEventListener('click', async () => {
+            const loginIdInput = document.getElementById('joinLoginIdInput');
+            const errorDiv = document.getElementById('joinErrorMsg');
+
+            if (!loginIdInput.value.trim()) {
+                errorDiv.innerText = "아이디를 입력해주세요.";
+                return;
             }
-            else {
-                errorDiv.innerText = result.message;
+
+            try {
+                const response = await fetch(`/join/check-id/${loginIdInput.value}`);
+                const data = await response.json();
+
+                if ((!response.ok)) {
+                    throw new Error(data.message);
+                }
+
+                alert(data.message);
+                loginIdInput.value = data.loginId;
+                loginIdInput.readOnly = true;
+                loginIdInput.style.backgroundColor = '#e9ecef';
+            }
+            catch (error) {
+                errorDiv.innerText = error.message;
             }
         });
-    });
 
-    document.getElementById('joinBtn').addEventListener('click', () => {
-        const errorDiv = document.getElementById('joinErrorMsg');
-
-        const joinData = {
-            loginId: document.getElementById('joinLoginIdInput').value,
-            password: document.getElementById('joinPasswordInput').value,
-            nickname: document.getElementById('joinNicknameInput').value
-        };
-
-        requestPost('/join', joinData).then(result => {
-            if(result.isSuccess){
-                alert(result.message)
-                location.replace('/');
-            }
-            else {
-                errorDiv.innerText = result.message;
-            }
-        });
-    });
-
-    document.getElementById('loginIdCheckBtn').addEventListener('click', async () => {
-        const loginIdInput = document.getElementById('joinLoginIdInput');
-        const errorDiv = document.getElementById('joinErrorMsg');
-
-        if(!loginIdInput.value.trim()) {
-            errorDiv.innerText = "아이디를 입력해주세요.";
-            return;
-        }
-        
-        try {
-            const response = await fetch(`/join/check-id/${loginIdInput.value}`);
-            const data = await response.json();
-
-            if((!response.ok)) {
-                throw new Error(data.message);
-            }
-
-            alert(data.message);
-            loginIdInput.value = data.loginId;
-            loginIdInput.readOnly = true;
-            loginIdInput.style.backgroundColor = '#e9ecef';
-        }
-        catch (error) {
-            errorDiv.innerText = error.message;
-        }
-    });
-
-</script>
+    </script>
 </body>
+
 </html>

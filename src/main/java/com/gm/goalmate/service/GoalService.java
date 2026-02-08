@@ -1,9 +1,6 @@
 package com.gm.goalmate.service;
 
-import com.gm.goalmate.domain.goal.Goal;
-import com.gm.goalmate.domain.goal.GoalRepository;
-import com.gm.goalmate.domain.goal.GoalResult;
-import com.gm.goalmate.domain.goal.GoalStatus;
+import com.gm.goalmate.domain.goal.*;
 import com.gm.goalmate.domain.user.User;
 import com.gm.goalmate.domain.user.UserRepository;
 import com.gm.goalmate.dto.GoalRequest;
@@ -15,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -60,17 +59,17 @@ public class GoalService {
         goal.update(request);
     }
 
-    public List<GoalResponse.SimpleInfo> getGoalsByUserId(Long userId) {
+    public List<GoalResponse.Calendar> getCalendarGoals(Long userId) {
         List<Goal> goals = goalRepository.findAllByUserUserId(userId);
         return goals.stream()
-                .map(goal -> GoalResponse.SimpleInfo.builder()
+                .map(goal -> GoalResponse.Calendar.builder()
                         .id(goal.getGoalId())
                         .task(goal.getTask())
                         .startDate(goal.getStartDate())
                         .dueDate(goal.getDueDate())
                         .type(goal.getType())
                         .build())
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional
@@ -93,6 +92,30 @@ public class GoalService {
             return "저장 완료. 이번의 아쉬움은 다음에 채워봐요💪";
     }
 
+    public GoalResponse.ListSimple getTodayGoalsByType(Long userId, GoalType type) {
+        LocalDate startDate = getStartDate(type);
+        LocalDate dueDate = getDueDate(type);
+
+        List<Goal> goals = goalRepository.findAllByUserUserIdAndStartDateBetweenAndType(userId, startDate, dueDate, type);
+        List<GoalResponse.ListItem> items = mapToListItems(goals);
+
+        return GoalResponse.ListSimple.builder()
+                .items(items)
+                .type(type)
+                .startDate(startDate)
+                .dueDate(dueDate)
+                .build();
+    }
+
+    private List<GoalResponse.ListItem> mapToListItems(List<Goal> goals) {
+        return goals.stream()
+                .map(goal -> GoalResponse.ListItem.builder()
+                        .id(goal.getGoalId())
+                        .task(goal.getTask())
+                        .result(goal.getResult())
+                        .build())
+                .toList();
+    }
     private Goal findGoalByGoalId(Long goalNum) {
         return goalRepository.findById(goalNum)
                 .orElseThrow(() -> new IllegalArgumentException("해당 목표를 찾을 수 없습니다."));
@@ -102,5 +125,27 @@ public class GoalService {
         if(!goal.getUser().getUserId().equals(userId)) { //작성자 = 로그인한 사용자
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "권한이 없습니다.");
         }
+    }
+
+    private LocalDate getStartDate(GoalType type) {
+        LocalDate today = LocalDate.now();
+
+        return switch (type) {
+            case DAILY -> today;
+            case WEEKLY -> today.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+            case MONTHLY -> today.with(TemporalAdjusters.firstDayOfMonth());
+            case YEARLY -> today.with(TemporalAdjusters.firstDayOfYear());
+        };
+    }
+
+    private LocalDate getDueDate(GoalType type) {
+        LocalDate today = LocalDate.now();
+
+        return switch (type) {
+            case DAILY -> today;
+            case WEEKLY -> today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY));
+            case MONTHLY -> today.with(TemporalAdjusters.lastDayOfMonth());
+            case YEARLY -> today.with(TemporalAdjusters.lastDayOfYear());
+        };
     }
 }

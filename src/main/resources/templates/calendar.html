@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+
 <head>
     <meta charset="UTF-8">
     <title>Goal Mate</title>
@@ -14,13 +15,13 @@
     <script>
         let selectedDate = '';
         let calendar;
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const calendarEl = document.getElementById('calendar');
             calendar = new FullCalendar.Calendar(calendarEl, {
                 customButtons: {
                     addGoalButton: {
                         text: '추가',
-                        click: function() {
+                        click: function () {
                             selectedDate = '';
                             clearModalInput();
                             document.querySelector('input[value="DAILY"]').checked = true;
@@ -45,7 +46,7 @@
                     day: '일간',
                     list: '목록'
                 },
-                events: function(info, successCallback, failureCallback) {
+                events: function (info, successCallback, failureCallback) {
                     fetch('/goals')
                         .then(res => res.json())
                         .then(data => {
@@ -58,8 +59,8 @@
                                     title: goal.task,
                                     start: goal.startDate,
                                     end: dueDate.toLocaleDateString('en-CA'),
-                                    extendedProps: { 
-                                        type: goal.type 
+                                    extendedProps: {
+                                        type: goal.type
                                     }
                                 };
                             });
@@ -69,19 +70,19 @@
                             failureCallback(error);
                         });
                 },
-                dateClick: function(info) {
+                dateClick: function (info) {
                     clearModalInput();
 
                     selectedDate = info.dateStr;
                     document.getElementById('startDateInput').value = selectedDate;
                     document.querySelector('input[value="DAILY"]').checked = true;
-                    
+
                     const event = new Event('change');
                     document.getElementById('startDateInput').dispatchEvent(event);
-                    
+
                     openModal(document.getElementById('addGoalModal'));
                 },
-                eventClick: function(info) {
+                eventClick: function (info) {
                     document.getElementById('goalIdInput').value = info.event.id;
                     document.getElementById('startDateInput').value = info.event.startStr;
                     document.getElementById('taskInput').value = info.event.title;
@@ -89,9 +90,9 @@
                     let date = new Date(info.event.end);
                     date.setDate(date.getDate() - 1);
                     document.getElementById('dueDateInput').value = date.toLocaleDateString('en-CA');
-                    
+
                     document.querySelectorAll('input[name="typeInput"]').forEach(input => {
-                        if(input.value === info.event.extendedProps.type)
+                        if (input.value === info.event.extendedProps.type)
                             input.checked = true;
                     });
 
@@ -102,109 +103,111 @@
         });
     </script>
 </head>
+
 <body>
 
-<div id="calendarContainer">
-    <div id='calendar'></div>
-</div>
+    <div id="calendarContainer">
+        <div id='calendar'></div>
+    </div>
 
-<dialog class="modalContent" id="addGoalModal">
-    <form method="dialog" class="modalForm"> 
-        <h3>새 목표 추가</h3>
-        <div>
-            <input type="radio" id="daily" name="typeInput" value="DAILY" checked>
-            <label for="daily">일간</label>
-            <input type="radio" id="weekly" name="typeInput" value="WEEKLY">
-            <label for="weekly">주간</label>
-            <input type="radio" id="monthly" name="typeInput" value="MONTHLY">
-            <label for="monthly">월간</label>
-            <input type="radio" id="yearly" name="typeInput" value="YEARLY">
-            <label for="yearly">연간</label>
-        </div>
+    <dialog class="modalContent" id="addGoalModal">
+        <form method="dialog" class="modalForm">
+            <h3>새 목표 추가</h3>
+            <div>
+                <input type="radio" id="daily" name="typeInput" value="DAILY" checked>
+                <label for="daily">일간</label>
+                <input type="radio" id="weekly" name="typeInput" value="WEEKLY">
+                <label for="weekly">주간</label>
+                <input type="radio" id="monthly" name="typeInput" value="MONTHLY">
+                <label for="monthly">월간</label>
+                <input type="radio" id="yearly" name="typeInput" value="YEARLY">
+                <label for="yearly">연간</label>
+            </div>
 
-        <input type="text" id="taskInput" placeholder="할 일 입력">
+            <input type="text" id="taskInput" placeholder="할 일 입력">
 
-        <label for="startDateInput">시작일</label>
-        <input type="date" id="startDateInput">
+            <label for="startDateInput">시작일</label>
+            <input type="date" id="startDateInput">
 
-        <label for="dueDateInput">종료일</label>
-        <input type="date" id="dueDateInput" readonly>
-        <input type="hidden" id="goalIdInput">
-        <div>
-            <button type="button" id="addGoalBtn">추가</button>
-            <button type="submit">닫기</button>
-        </div>
-    </form>
-</dialog>
-<script type="text/javascript" src="/js/modal.js"></script>
-<script type="text/javascript" src="/js/apiUtil.js"></script>
-<script>
-    document.getElementById('startDateInput').addEventListener('input', e => {
-        selectedDate = e.target.value; 
-    });
+            <label for="dueDateInput">종료일</label>
+            <input type="date" id="dueDateInput" readonly>
+            <input type="hidden" id="goalIdInput">
+            <div>
+                <button type="button" id="addGoalBtn">추가</button>
+                <button type="submit">닫기</button>
+            </div>
+        </form>
+    </dialog>
+    <script type="text/javascript" src="/js/modal.js"></script>
+    <script type="text/javascript" src="/js/apiUtil.js"></script>
+    <script>
+        document.getElementById('startDateInput').addEventListener('input', e => {
+            selectedDate = e.target.value;
+        });
 
-    document.getElementById('startDateInput').addEventListener('change', e => {
-        const selectedType = document.querySelector('input[name="typeInput"]:checked').value;
-        const dueDateInput = document.getElementById('dueDateInput');
+        document.getElementById('startDateInput').addEventListener('change', e => {
+            const selectedType = document.querySelector('input[name="typeInput"]:checked').value;
+            const dueDateInput = document.getElementById('dueDateInput');
 
-        if (!selectedDate) return;
+            if (!selectedDate) return;
 
-        let date = new Date(selectedDate);
+            let date = new Date(selectedDate);
 
-        if(selectedType === 'DAILY') {
-            dueDateInput.value = selectedDate;
-            document.getElementById('startDateInput').value = dueDateInput.value;
-        } else if(selectedType === 'WEEKLY') {
-            const day = date.getDay();
-            date.setDate(date.getDate() - day); //일요일
-            e.target.value = date.toLocaleDateString('en-CA');
+            if (selectedType === 'DAILY') {
+                dueDateInput.value = selectedDate;
+                document.getElementById('startDateInput').value = dueDateInput.value;
+            } else if (selectedType === 'WEEKLY') {
+                const day = date.getDay();
+                date.setDate(date.getDate() - day); //일요일
+                e.target.value = date.toLocaleDateString('en-CA');
 
-            date.setDate(date.getDate() + 6); //토요일
-            dueDateInput.value = date.toLocaleDateString('en-CA');
-        } else if(selectedType === 'MONTHLY') {
-            date.setDate(1);
-            e.target.value = date.toLocaleDateString('en-CA');
+                date.setDate(date.getDate() + 6); //토요일
+                dueDateInput.value = date.toLocaleDateString('en-CA');
+            } else if (selectedType === 'MONTHLY') {
+                date.setDate(1);
+                e.target.value = date.toLocaleDateString('en-CA');
 
-            date.setMonth(date.getMonth()+1);
-            date.setDate(0);
-            dueDateInput.value = date.toLocaleDateString('en-CA');
-        } else if(selectedType === 'YEARLY') {
-            const year = e.target.value.split('-')[0];
-            e.target.value = `${year}-01-01`;
-            dueDateInput.value = `${year}-12-31`;
-        } else {
-            alert('유효한 선택이 아닙니다.');
-        }
-    });
-
-    document.querySelectorAll('input[name="typeInput"]').forEach(input => {
-        input.addEventListener('change', () => {
-            const startDateInput = document.getElementById('startDateInput');
-            
-            if (startDateInput.value) {
-                const event = new Event('change');
-                startDateInput.dispatchEvent(event);
+                date.setMonth(date.getMonth() + 1);
+                date.setDate(0);
+                dueDateInput.value = date.toLocaleDateString('en-CA');
+            } else if (selectedType === 'YEARLY') {
+                const year = e.target.value.split('-')[0];
+                e.target.value = `${year}-01-01`;
+                dueDateInput.value = `${year}-12-31`;
+            } else {
+                alert('유효한 선택이 아닙니다.');
             }
         });
-    });
 
-    document.getElementById('addGoalBtn').addEventListener('click', () => {
-        const addGoalData = {
-            task: document.getElementById('taskInput').value,
-            type: document.querySelector('input[name="typeInput"]:checked').value,
-            startDate: document.getElementById('startDateInput').value,
-            dueDate: document.getElementById('dueDateInput').value
-        };
-        
-        requestPost('/goals', addGoalData).then(result => {
-            if(result.isSuccess){
-                calendar.refetchEvents();
-                document.getElementById('addGoalModal').close();
-            }
-            alert(result.message);
+        document.querySelectorAll('input[name="typeInput"]').forEach(input => {
+            input.addEventListener('change', () => {
+                const startDateInput = document.getElementById('startDateInput');
+
+                if (startDateInput.value) {
+                    const event = new Event('change');
+                    startDateInput.dispatchEvent(event);
+                }
+            });
         });
-    });
 
-</script>
+        document.getElementById('addGoalBtn').addEventListener('click', () => {
+            const addGoalData = {
+                task: document.getElementById('taskInput').value,
+                type: document.querySelector('input[name="typeInput"]:checked').value,
+                startDate: document.getElementById('startDateInput').value,
+                dueDate: document.getElementById('dueDateInput').value
+            };
+
+            requestPost('/goals', addGoalData).then(result => {
+                if (result.isSuccess) {
+                    calendar.refetchEvents();
+                    document.getElementById('addGoalModal').close();
+                }
+                alert(result.message);
+            });
+        });
+
+    </script>
 </body>
+
 </html>

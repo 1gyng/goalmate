@@ -1,6 +1,7 @@
 package com.gm.goalmate.controller;
 
 import com.gm.goalmate.config.LoginUser;
+import com.gm.goalmate.domain.goal.GoalType;
 import com.gm.goalmate.domain.user.User;
 import com.gm.goalmate.dto.GoalRequest;
 import com.gm.goalmate.dto.GoalResponse;
@@ -9,6 +10,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,13 +31,18 @@ public class GoalController {
     }
 
     @GetMapping("/list")
-    public String showList() {
+    public String showList(@LoginUser User user, Model model) {
+        model.addAttribute("dailyGoals", goalService.getTodayGoalsByType(user.getUserId(), GoalType.DAILY));
+        model.addAttribute("weeklyGoals", goalService.getTodayGoalsByType(user.getUserId(), GoalType.WEEKLY));
+        model.addAttribute("monthlyGoals", goalService.getTodayGoalsByType(user.getUserId(), GoalType.MONTHLY));
+        model.addAttribute("yearlyGoals", goalService.getTodayGoalsByType(user.getUserId(), GoalType.YEARLY));
+
         return "goal-list";
     }
 
     @GetMapping("/goals")
-    public ResponseEntity<List<GoalResponse.SimpleInfo>> getGoalsByUserId(@LoginUser User user) {
-        List<GoalResponse.SimpleInfo> goals = goalService.getGoalsByUserId(user.getUserId());
+    public ResponseEntity<List<GoalResponse.Calendar>> getCalendarGoals(@LoginUser User user) {
+        List<GoalResponse.Calendar> goals = goalService.getCalendarGoals(user.getUserId());
         return ResponseEntity.ok(goals);
     }
 
