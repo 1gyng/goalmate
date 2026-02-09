@@ -111,7 +111,7 @@
     </div>
 
     <dialog class="modalContent" id="addGoalModal">
-        <form method="dialog" class="modalForm">
+        <form method="dialog" class="modal-form">
             <h3>새 목표 추가</h3>
             <div>
                 <input type="radio" id="daily" name="typeInput" value="DAILY" checked>
@@ -207,6 +207,25 @@
             });
         });
 
+    </script>
+    <script type="module">
+        import { requestPost } from '/js/apiUtil.js';
+        document.getElementById('addGoalBtn').addEventListener('click', () => {
+            const addGoalData = {
+                task: document.getElementById('taskInput').value,
+                type: document.querySelector('input[name="typeInput"]:checked').value,
+                startDate: document.getElementById('startDateInput').value,
+                dueDate: document.getElementById('dueDateInput').value
+            };
+
+            requestPost('/goals', addGoalData).then(result => {
+                if (result.isSuccess) {
+                    calendar.refetchEvents();
+                    document.getElementById('addGoalModal').close();
+                }
+                alert(result.message);
+            });
+        });
     </script>
 </body>
 

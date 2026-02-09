@@ -15,7 +15,6 @@
         <input id="selfReflectionDrawer" type="checkbox" class="drawer-toggle" />
 
         <div class="drawer-content flex flex-col p-6 transition-all duration-300">
-
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
                 <div class="card bg-base-100 shadow-xl border border-base-200">
                     <div class="card-body p-6">
@@ -28,9 +27,9 @@
                                 <li th:if="${#lists.isEmpty(dailyGoals.items)}">등록된 일간 목표가 없어요!</li>
                                 <li th:unless="${#lists.isEmpty(dailyGoals.items)}"
                                     th:each="goal : ${dailyGoals.items}">
-                                    <button type="button" class="justify-start font-normal" th:data-id="${goal.id}"
-                                        th:data-task="${goal.task}" th:data-result="${goal.result}"
-                                        onclick="showSelfReflectionDrawer(this)">
+                                    <button type="button" class="goal-item-btn justify-start font-normal"
+                                        th:data-id="${goal.id}" th:data-task="${goal.task}"
+                                        th:data-result="${goal.result}">
                                         <span th:text="${goal.task}">목표 제목</span>
                                     </button>
                                 </li>
@@ -52,9 +51,9 @@
                                 <li th:if="${#lists.isEmpty(weeklyGoals.items)}">등록된 주간 목표가 없어요!</li>
                                 <li th:unless="${#lists.isEmpty(weeklyGoals.items)}"
                                     th:each="goal : ${weeklyGoals.items}">
-                                    <button type="button" class="justify-start font-normal" th:data-id="${goal.id}"
-                                        th:data-task="${goal.task}" th:data-result="${goal.result}"
-                                        onclick="showSelfReflectionDrawer(this)">
+                                    <button type="button" class="goal-item-btn justify-start font-normal"
+                                        th:data-id="${goal.id}" th:data-task="${goal.task}"
+                                        th:data-result="${goal.result}">
                                         <span th:text="${goal.task}">목표 제목</span>
                                     </button>
                                 </li>
@@ -76,9 +75,9 @@
                                 <li th:if="${#lists.isEmpty(monthlyGoals.items)}">등록된 월간 목표가 없어요!</li>
                                 <li th:unless="${#lists.isEmpty(monthlyGoals.items)}"
                                     th:each="goal : ${monthlyGoals.items}">
-                                    <button type="button" class="justify-start font-normal" th:data-id="${goal.id}"
-                                        th:data-task="${goal.task}" th:data-result="${goal.result}"
-                                        onclick="showSelfReflectionDrawer(this)">
+                                    <button type="button" class="goal-item-btn justify-start font-normal"
+                                        th:data-id="${goal.id}" th:data-task="${goal.task}"
+                                        th:data-result="${goal.result}">
                                         <span th:text="${goal.task}">목표 제목</span>
                                     </button>
                                 </li>
@@ -100,9 +99,9 @@
                                 <li th:if="${#lists.isEmpty(yearlyGoals.items)}">등록된 연간 목표가 없어요!</li>
                                 <li th:unless="${#lists.isEmpty(yearlyGoals.items)}"
                                     th:each="goal : ${yearlyGoals.items}">
-                                    <button type="button" class="justify-start font-normal" th:data-id="${goal.id}"
-                                        th:data-task="${goal.task}" th:data-result="${goal.result}"
-                                        onclick="showSelfReflectionDrawer(this)">
+                                    <button type="button" class="goal-item-btn justify-start font-normal"
+                                        th:data-id="${goal.id}" th:data-task="${goal.task}"
+                                        th:data-result="${goal.result}">
                                         <span th:text="${goal.task}">목표 제목</span>
                                     </button>
                                 </li>
@@ -117,7 +116,7 @@
             <label for="selfReflectionDrawer" class="drawer-overlay"></label>
             <div class="p-4 w-96 min-h-full flex flex-col h-screen gap-y-4">
                 <div class="flex justify-start">
-                    <button class="btn btn-circle btn-ghost" onclick="toggleDrawer()">
+                    <button id="toggle-drawer-btn" class="btn btn-circle btn-ghost">
                         <i data-lucide="chevrons-right" class="w-8 h-8"></i>
                     </button>
                 </div>
@@ -128,8 +127,10 @@
                             <span class="text-2xl" id="drawer-goal-task"></span>
                         </h2>
                         <div class="join w-full" id="result-radio-div">
-                            <input type="radio" class="btn join-item flex-1" name="result" aria-label="달성" value="SUCCESS" />
-                            <input type="radio" class="btn join-item flex-1" name="result" aria-label="미달성" value="FAILED" />
+                            <input type="radio" class="btn join-item flex-1" name="result" aria-label="달성"
+                                value="SUCCESS" />
+                            <input type="radio" class="btn join-item flex-1" name="result" aria-label="미달성"
+                                value="FAILED" />
                         </div>
                     </div>
                 </div>
@@ -141,7 +142,18 @@
             </div>
         </div>
     </div>
-    <script>
+    <script type="module">
+        import { sendRequest } from '/js/apiUtil.js';
+
+        const GOAL_RESULT_MESSAGES = {
+            SUCCESS: "목표 달성! 다음 목표도 파이팅 해봐요✨",
+            FAILED: "저장 완료. 이번의 아쉬움은 다음에 채워봐요💪"
+        };
+
+
+        let currentGoalId = null;
+        let currentGoalResult = null;
+
         lucide.createIcons();
 
         function toggleDrawer() {
@@ -149,14 +161,17 @@
             container.classList.toggle('drawer-open');
         }
 
+        document.getElementById('toggle-drawer-btn').addEventListener('click', toggleDrawer);
+
         function showSelfReflectionDrawer(e) {
-            const goalId = e.dataset.id;
+            currentGoalId = e.dataset.id;
+            currentGoalResult = e.dataset.result;
+
             const goalTask = e.dataset.task;
-            const goalResult = e.target.result;
 
             document.getElementById('drawer-goal-task').innerText = `🎯 ${goalTask}`;
 
-            const targetRadio = document.querySelector(`#result-radio-div input[value="${goalResult}"]`);
+            const targetRadio = document.querySelector(`#result-radio-div input[value="${currentGoalResult}"]`);
             if (targetRadio) {
                 targetRadio.checked = true;
             }
@@ -164,35 +179,33 @@
             toggleDrawer();
         }
 
+        document.querySelectorAll('.goal-item-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                const clickedBtn = e.currentTarget;
+
+                showSelfReflectionDrawer(clickedBtn);
+            })
+        })
+
         document.querySelectorAll('#result-radio-div input[type="radio"]').forEach(radio => {
             radio.addEventListener('change', async (e) => {
-                const goalId = '';
-                const savedResult = '';
-                const result = e.target.value;
+                const goalId = currentGoalId;
+                const savedResult = currentGoalResult;
+                const selectedResult = e.target.value;
 
-                if (savedResult === result) {
+                if (savedResult === selectedResult) {
                     return;
                 }
 
                 const updateResultData = {
-                    result: result
+                    result: selectedResult
                 };
 
                 try {
-                    const response = await fetch(`/goals/${goalId}/result`, {
-                        method: 'PATCH',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(updateResultData)
-                    });
-                    const data = await response.json();
+                    const apiResponse = await sendRequest(`/goals/${goalId}/result`, 'PATCH', updateResultData);
+                    alert(GOAL_RESULT_MESSAGES[apiResponse.result]);
 
-                    if (!response.ok) {
-                        throw new Error(data.message);
-                    }
-
-                    alert(data.message);
-                }
-                catch (error) {
+                } catch (error) {
                     alert(error.message);
                 }
             });

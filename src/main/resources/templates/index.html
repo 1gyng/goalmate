@@ -18,7 +18,7 @@
 
     <dialog id="loginModal" class="modal">
         <div class="modal-box !max-w-sm rounded-2xl">
-            <form method="dialog" class="modalForm flex flex-col gap-4">
+            <form method="dialog" class="modal-form flex flex-col gap-4">
                 <h2 class="text-center text-primary">로그인</h2>
 
                 <input type="text" id="loginIdInput" class="input input-bordered rounded-xl input-primary w-full"
@@ -46,7 +46,7 @@
 
     <dialog class="modal" id="joinModal">
         <div class="modal-box !max-w-sm rounded-2xl">
-            <form method="dialog" class="modalForm flex flex-col gap-4">
+            <form method="dialog" class="modal-form flex flex-col gap-4">
                 <h2 class="text-center text-primary">회원가입</h2>
                 <div class="flex w-full gap-2">
                     <input type="text" id="joinLoginIdInput" class="input input-bordered input-primary rounded-xl grow"
@@ -75,90 +75,96 @@
         </form>
     </dialog>
 
+    <script type="module">
+        import { sendRequest } from '/js/apiUtil.js';
+        import { clearModalInput } from '/js/modal.js';
 
-    <script type="text/javascript" src="/js/modal.js"></script>
-    <script type="text/javascript" src="/js/apiUtil.js"></script>
-    <script>
-        const loginModal = document.getElementById('loginModal');
-        const joinModal = document.getElementById('joinModal');
+        const elements = {
+            modal: {
+                login: document.getElementById('loginModal'),
+                join: document.getElementById('joinModal')
+            },
+            joinInput: {
+                id: document.getElementById('joinLoginIdInput'),
+                password: document.getElementById('joinPasswordInput'),
+                nickname: document.getElementById('joinNicknameInput')
+            },
+            loginInput: {
+                id: document.getElementById('loginIdInput'),
+                password: document.getElementById('passwordInput')
+            },
+            errorDiv: {
+                join: document.getElementById('joinErrorMsg'),
+                login: document.getElementById('loginErrorMsg')
+            }
+        };
 
         document.getElementById('openLoginModal').addEventListener('click', () => {
-            openModal(loginModal);
+            clearModalInput();
+            elements.modal.login.showModal();
         });
 
         document.getElementById('openJoinModal').addEventListener('click', () => {
-            openModal(joinModal);
+            clearModalInput();
+            elements.modal.join.showModal();
         });
 
         document.getElementById('loginModalJoinBtn').addEventListener('click', () => {
-            loginModal.close();
-            openModal(joinModal);
+            elements.modal.login.close();
+            elements.modal.join.showModal();
         });
 
-        document.getElementById('loginBtn').addEventListener('click', () => {
-            const errorDiv = document.getElementById('loginErrorMsg');
-
-            const loginData = {
-                loginId: document.getElementById('loginIdInput').value,
-                password: document.getElementById('passwordInput').value
-            };
-
-            requestPost('/login', loginData).then(result => {
-                if (result.isSuccess) {
-                    location.replace('/calendar');
-                }
-                else {
-                    errorDiv.innerText = result.message;
-                }
-            });
-        });
-
-        document.getElementById('joinBtn').addEventListener('click', () => {
-            const errorDiv = document.getElementById('joinErrorMsg');
-
-            const joinData = {
-                loginId: document.getElementById('joinLoginIdInput').value,
-                password: document.getElementById('joinPasswordInput').value,
-                nickname: document.getElementById('joinNicknameInput').value
-            };
-
-            requestPost('/join', joinData).then(result => {
-                if (result.isSuccess) {
-                    alert(result.message)
-                    location.replace('/');
-                }
-                else {
-                    errorDiv.innerText = result.message;
-                }
-            });
-        });
-
-        document.getElementById('loginIdCheckBtn').addEventListener('click', async () => {
-            const loginIdInput = document.getElementById('joinLoginIdInput');
-            const errorDiv = document.getElementById('joinErrorMsg');
-
-            if (!loginIdInput.value.trim()) {
-                errorDiv.innerText = "아이디를 입력해주세요.";
+        const checkJoinId = async () => {
+            if (!elements.joinInput.id.value.trim()) {
+                elements.errorDiv.join.innerText = "아이디를 입력해주세요.";
                 return;
             }
 
             try {
-                const response = await fetch(`/join/check-id/${loginIdInput.value}`);
-                const data = await response.json();
+                const apiResponse = await sendRequest(`/join/check-id/${elements.joinInput.id.value}`, 'GET');
+                alert(apiResponse.message);
 
-                if ((!response.ok)) {
-                    throw new Error(data.message);
-                }
+                elements.joinInput.id.value = apiResponse.loginId;
+                elements.joinInput.id.readOnly = true;
+                elements.joinInput.id.style.backgroundColor = '#e9ecef';
+            } catch (error) {
+                elements.errorDiv.join.innerText = error.message;
+            }
+        }
 
-                alert(data.message);
-                loginIdInput.value = data.loginId;
-                loginIdInput.readOnly = true;
-                loginIdInput.style.backgroundColor = '#e9ecef';
+        const join = async () => {
+            const joinData = {
+                loginId: elements.joinInput.id.value,
+                password: elements.joinInput.password.value,
+                nickname: elements.joinInput.nickname.value
+            };
+
+            try {
+                const apiResponse = await sendRequest('/join', 'POST', joinData);
+                alert(apiResponse.message);
+                location.replace('/');
+            } catch (error) {
+                elements.errorDiv.join.innerText = error.message;
             }
-            catch (error) {
-                errorDiv.innerText = error.message;
+        }
+
+        const login = async () => {
+            const loginData = {
+                loginId: elements.loginInput.id.value,
+                password: elements.loginInput.password.value
+            };
+
+            try {
+                const apiResponse = await sendRequest('/login', 'POST', loginData);
+                location.replace('/calendar');
+            } catch (error) {
+                elements.errorDiv.login.innerText = error.message;
             }
-        });
+        }
+
+        document.getElementById('loginIdCheckBtn').addEventListener('click', checkJoinId);
+        document.getElementById('loginBtn').addEventListener('click', login);
+        document.getElementById('joinBtn').addEventListener('click', join);
 
     </script>
 </body>

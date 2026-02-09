@@ -39,7 +39,6 @@ public class GoalService {
                 .startDate(request.getStartDate())
                 .dueDate(request.getDueDate())
                 .user(user)
-                .today(LocalDate.now())
                 .build();
 
         return goalRepository.save(goal).getGoalId();
@@ -73,30 +72,19 @@ public class GoalService {
     }
 
     @Transactional
-    @Scheduled(cron = "0 0 0 * * *") // 매일 0시 0분 0초(자정)에 실행
-    public void updateStatus() {
-        LocalDate today = LocalDate.now();
-        goalRepository.updateStatusToTodo(today);
-        goalRepository.updateStatusToInProgress(today);
-        goalRepository.updateStatusToCompleted(today);
-    }
-
-    @Transactional
-    public String updateGoalResult(Long goalNum, GoalRequest.UpdateResult request) {
+    public GoalResult updateGoalResult(Long goalNum, GoalRequest.UpdateResult request, Long userId) {
         Goal goal = findGoalByGoalId(goalNum);
+        validateWriter(goal, userId);
         goal.updateResult(request);
 
-        if(goal.getResult() == GoalResult.SUCCESS) {
-            return "목표 달성! 다음 목표도 파이팅 해봐요✨";
-        } else
-            return "저장 완료. 이번의 아쉬움은 다음에 채워봐요💪";
+        return goal.getResult();
     }
 
     public GoalResponse.ListSimple getTodayGoalsByType(Long userId, GoalType type) {
         LocalDate startDate = getStartDate(type);
         LocalDate dueDate = getDueDate(type);
 
-        List<Goal> goals = goalRepository.findAllByUserUserIdAndStartDateBetweenAndType(userId, startDate, dueDate, type);
+        List<Goal> goals = goalRepository.findAllByUser_UserIdAndStartDateBetweenAndType(userId, startDate, dueDate, type);
         List<GoalResponse.ListItem> items = mapToListItems(goals);
 
         return GoalResponse.ListSimple.builder()

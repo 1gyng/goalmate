@@ -1,6 +1,7 @@
 package com.gm.goalmate.controller;
 
 import com.gm.goalmate.config.LoginUser;
+import com.gm.goalmate.domain.goal.GoalResult;
 import com.gm.goalmate.domain.goal.GoalType;
 import com.gm.goalmate.domain.user.User;
 import com.gm.goalmate.dto.GoalRequest;
@@ -65,9 +66,9 @@ public class GoalController {
     }
 
     @PatchMapping("/goals/{goalNum}/result")
-    public ResponseEntity<?> updateGoalStatus(@PathVariable Long goalNum, @Valid @RequestBody GoalRequest.UpdateResult request) {
-        String msg = goalService.updateGoalResult(goalNum, request);
-        return ResponseEntity.ok(Map.of("message", msg));
+    public ResponseEntity<?> updateGoalResult(@PathVariable Long goalNum, @Valid @RequestBody GoalRequest.UpdateResult request, @LoginUser User user) {
+        GoalResult result = goalService.updateGoalResult(goalNum, request, user.getUserId());
+        return ResponseEntity.ok(Map.of("result", result, "message", "결과가 저장되었습니다."));
     }
 
 }

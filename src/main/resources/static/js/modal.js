@@ -5,8 +5,8 @@ function openModal(target) {
     }
 }
 
-function clearModalInput() {
-    document.querySelectorAll('.modalForm input').forEach(input => {
+export function clearModalInput() {
+    document.querySelectorAll('.modal-form input').forEach(input => {
         if (input.type === 'radio') {
             input.checked = false;
         }

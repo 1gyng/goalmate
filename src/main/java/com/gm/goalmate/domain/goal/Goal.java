@@ -28,10 +28,6 @@ public class Goal {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private GoalStatus status;
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private GoalResult result = GoalResult.NONE;
 
     @Column(nullable = false)
@@ -47,7 +43,7 @@ public class Goal {
     private User user;
 
     @Builder
-    public Goal(String task, GoalType type, LocalDate startDate, LocalDate dueDate, User user, LocalDate today) {
+    public Goal(String task, GoalType type, LocalDate startDate, LocalDate dueDate, User user) {
         validateDateRange(startDate, dueDate);
 
         this.task = task;
@@ -55,7 +51,6 @@ public class Goal {
         this.startDate = startDate;
         this.dueDate = dueDate;
         this.user = user;
-        this.status = determineStatus(today);
     }
 
     public void update(GoalRequest.Update request) {
@@ -72,7 +67,7 @@ public class Goal {
             throw new IllegalArgumentException("달성 또는 미달성만 가능합니다.");
         }
 
-        this.result = request.getResult();
+        this.result = result;
     }
 
     private void validateDateRange(LocalDate startDate, LocalDate dueDate) {
