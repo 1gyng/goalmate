@@ -67,7 +67,7 @@ public class GoalController {
 
     @PatchMapping("/goals/{goalNum}/result")
     public ResponseEntity<?> updateGoalResult(@PathVariable Long goalNum, @Valid @RequestBody GoalRequest.UpdateResult request, @LoginUser User user) {
-        GoalResult result = goalService.updateGoalResult(goalNum, request, user.getUserId());
+        GoalResponse.Result result = goalService.updateGoalResult(goalNum, request, user.getUserId());
         return ResponseEntity.ok(Map.of("result", result, "message", "결과가 저장되었습니다."));
     }
 

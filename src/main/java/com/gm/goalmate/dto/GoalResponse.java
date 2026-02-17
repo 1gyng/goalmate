@@ -46,5 +46,11 @@ public class GoalResponse {
         private GoalResult result;
     }
 
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class Result {
+        private GoalResult result;
+    }
 
 }

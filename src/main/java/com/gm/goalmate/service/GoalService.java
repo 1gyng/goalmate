@@ -72,12 +72,14 @@ public class GoalService {
     }
 
     @Transactional
-    public GoalResult updateGoalResult(Long goalNum, GoalRequest.UpdateResult request, Long userId) {
+    public GoalResponse.Result updateGoalResult(Long goalNum, GoalRequest.UpdateResult request, Long userId) {
         Goal goal = findGoalByGoalId(goalNum);
         validateWriter(goal, userId);
         goal.updateResult(request);
 
-        return goal.getResult();
+        return GoalResponse.Result.builder()
+                .result(goal.getResult())
+                .build();
     }
 
     public GoalResponse.ListSimple getTodayGoalsByType(Long userId, GoalType type) {

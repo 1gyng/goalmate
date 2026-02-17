@@ -62,11 +62,7 @@ public class Goal {
 
     public void updateResult(GoalRequest.UpdateResult request) {
         GoalResult result = request.getResult();
-
-        if(result != GoalResult.SUCCESS && result != GoalResult.FAILED) {
-            throw new IllegalArgumentException("달성 또는 미달성만 가능합니다.");
-        }
-
+        validateResult(result);
         this.result = result;
     }
 
@@ -76,13 +72,9 @@ public class Goal {
         }
     }
 
-    public GoalStatus determineStatus(LocalDate today) {
-        if(today.isBefore(this.startDate)) {
-            return GoalStatus.PLANNED;
-        } else if (today.isAfter(this.dueDate)) {
-            return GoalStatus.ENDED;
-        } else {
-            return GoalStatus.IN_PROGRESS;
+    private void validateResult(GoalResult result) {
+        if(result != GoalResult.SUCCESS && result != GoalResult.FAILED) {
+            throw new IllegalArgumentException("달성 또는 미달성만 가능합니다.");
         }
     }
 }
