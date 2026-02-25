@@ -15,7 +15,7 @@ public class GoalRequest {
     @Getter
     @Setter
     public static class Add {
-        @NotBlank(message = "할 일을 입력해주세요.")
+        @NotBlank(message = "목표를 입력해주세요.")
         private String task;
 
         @NotNull(message = "구분을 선택해주세요.")
@@ -31,7 +31,7 @@ public class GoalRequest {
     @Getter
     @Setter
     public static class Update {
-        @NotBlank(message = "할 일을 입력해주세요.")
+        @NotBlank(message = "목표를 입력해주세요.")
         private String task;
 
         @NotNull(message = "구분을 선택해주세요.")

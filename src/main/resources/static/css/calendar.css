@@ -1,20 +1,96 @@
 #calendarContainer {
     width: 90%;
     max-width: 1100px;
-    margin: 50px auto; 
+    margin: 30px auto;
     background: #ffffff;
-    padding: 25px;
+    padding: 30px;
     border-radius: 15px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+.fc-daygrid-more-link {
+    display: block !important;
+    text-align: center;
+    background-color: #f1f5f1 !important;
+    color: #9ab0a6 !important;
+    font-size: 0.7rem !important;
+    padding: 4px !important;
+    margin-top: 2px !important;
+    border-radius: 8px !important;
+}
+
+.fc-daygrid-more-link:hover {
+    background-color: #9ab0a6 !important;
+    color: white !important;
 }
 
 .fc-button-primary {
-    background-color: #4A90E2 !important;
-    border-color: #4A90E2 !important;
-
+    background-color: #9ab0a6 !important;
+    border-color: #9ab0a6 !important;
 }
 
 .fc-view-harness {
-    user-select: none; 
+    user-select: none;
     -webkit-user-select: none;
+}
+
+#openAddGoalBtn:hover {
+    background-color: #e8eaec;
+}
+
+.fc .fc-day-today {
+    background-color: #f8fafc !important;
+}
+
+.fc-event {
+    border: none !important;
+    background-color: transparent !important;
+    margin-bottom: 2px !important;
+}
+
+.fc-h-event .fc-event-main {
+    color: inherit !important;
+}
+
+.event-daily, .event-weekly, .event-monthly, .event-yearly {
+    border-left: none !important;
+}
+
+.fc-event-start.event-monthly {
+    background-color: rgba(226, 155, 140, 0.1) !important;
+    color: #A37065FF !important;
+    border-left: 5px solid #E29B8CFF !important;
+}
+
+.event-monthly {
+    background-color: rgba(226, 155, 140, 0.1) !important;
+    color: #A37065FF !important;
+}
+
+.event-daily {
+    background-color: rgba(154, 176, 166, 0.2) !important;
+    border-left: 5px solid #9ab0a6 !important;
+    color: #4a5d55 !important;
+}
+
+.event-weekly {
+    background-color: rgba(139, 163, 184, 0.2) !important;
+    border-left: 5px solid #8ba3b8 !important;
+    color: #576673FF !important;
+}
+
+.fc-event-start.event-yearly {
+    background-color: rgba(180, 167, 214, 0.1) !important;
+    border-left: 5px solid #B4A7D6FF !important;
+    color: #716987 !important;
+}
+
+.event-yearly {
+    background-color: rgba(180, 167, 214, 0.1) !important;
+    color: #716987 !important;
+}
+
+#dueDateInput::-webkit-calendar-picker-indicator {
+    display: none !important;
+    -webkit-appearance: none;
 }

@@ -1,7 +1,6 @@
 package com.gm.goalmate.controller;
 
 import com.gm.goalmate.config.LoginUser;
-import com.gm.goalmate.domain.goal.GoalResult;
 import com.gm.goalmate.domain.goal.GoalType;
 import com.gm.goalmate.domain.user.User;
 import com.gm.goalmate.dto.GoalRequest;
@@ -31,14 +30,14 @@ public class GoalController {
         return "calendar";
     }
 
-    @GetMapping("/list")
+    @GetMapping("/goals/today")
     public String showList(@LoginUser User user, Model model) {
         model.addAttribute("dailyGoals", goalService.getTodayGoalsByType(user.getUserId(), GoalType.DAILY));
         model.addAttribute("weeklyGoals", goalService.getTodayGoalsByType(user.getUserId(), GoalType.WEEKLY));
         model.addAttribute("monthlyGoals", goalService.getTodayGoalsByType(user.getUserId(), GoalType.MONTHLY));
         model.addAttribute("yearlyGoals", goalService.getTodayGoalsByType(user.getUserId(), GoalType.YEARLY));
 
-        return "goal-list";
+        return "today-goal";
     }
 
     @GetMapping("/goals")
@@ -50,7 +49,7 @@ public class GoalController {
     @PostMapping("/goals")
     public ResponseEntity<?> addGoal(@Valid @RequestBody GoalRequest.Add request, @LoginUser User user) {
         Long goalId = goalService.addGoal(request, user.getUserId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("id", goalId,"message", "목표가 추가되었습니다!"));
+        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("id", goalId, "message", "목표가 추가되었습니다!"));
     }
 
     @DeleteMapping("/goals/{goalNum}")

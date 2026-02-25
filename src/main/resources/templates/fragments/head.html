@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="head-config(title, extra)">
+    <meta charset="UTF-8">
+    <title th:text="${title}"></title>
+    <link th:href="@{/css/common.css}" href="../css/common.css" rel="stylesheet">
+    <link th:href="@{/css/modal.css}" href="../css/modal.css" rel="stylesheet">
+
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@5" rel="stylesheet" type="text/css"/>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+
+    <th:block th:if="${extra} != null">
+        <th:block th:replace="${extra}"></th:block>
+    </th:block>
+</head>
+<body>
+</body>
+</html>
