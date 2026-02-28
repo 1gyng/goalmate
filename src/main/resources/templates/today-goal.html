@@ -145,9 +145,10 @@
     </div>
 </div>
 
-<script src="https://unpkg.com/lucide@latest"></script>
+<th:block th:replace="~{fragments/script :: common-script}"></th:block>
 <script type="module">
     import {sendRequest} from '/js/apiUtil.js';
+    import {toast} from '/js/uiManager.js';
 
     const GOAL_RESULT_MESSAGES = {
         SUCCESS: "목표 달성! 다음 목표도 파이팅 해봐요✨",
@@ -157,8 +158,6 @@
 
     let currentGoalId = null;
     let currentGoalResult = null;
-
-    lucide.createIcons();
 
     function toggleDrawer() {
         const container = document.getElementById('drawer-container');
@@ -207,10 +206,10 @@
 
             try {
                 const apiResponse = await sendRequest(`/goals/${goalId}/result`, 'PATCH', updateResultData);
-                alert(GOAL_RESULT_MESSAGES[apiResponse.result]);
-
+                currentGoalResult = selectedResult;
+                toast.success(GOAL_RESULT_MESSAGES[apiResponse.result]);
             } catch (error) {
-                alert(error.message);
+                toast.error(error.message);
             }
         });
     });

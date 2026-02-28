@@ -1,5 +1,5 @@
-import { sendRequest } from './apiUtil.js';
-import { clearModalInput } from './modal.js';
+import {sendRequest} from './apiUtil.js';
+import {clearModalInput} from './modal.js';
 
 const elements = {
     modal: {
@@ -18,20 +18,28 @@ const elements = {
     errorDiv: {
         join: document.getElementById('joinErrorMsg'),
         login: document.getElementById('loginErrorMsg')
+    },
+    button: {
+        loginModal: document.getElementById('openLoginModal'),
+        joinModal: document.getElementById('openJoinModal'),
+        switchToJoin: document.getElementById('loginModalJoinBtn'),
+        idCheck: document.getElementById('loginIdCheckBtn'),
+        login: document.getElementById('loginBtn'),
+        join: document.getElementById('joinBtn')
     }
 };
 
-document.getElementById('openLoginModal').addEventListener('click', () => {
+elements.button.loginModal.addEventListener('click', () => {
     clearModalInput();
     elements.modal.login.showModal();
 });
 
-document.getElementById('openJoinModal').addEventListener('click', () => {
+elements.button.joinModal.addEventListener('click', () => {
     clearModalInput();
     elements.modal.join.showModal();
 });
 
-document.getElementById('loginModalJoinBtn').addEventListener('click', () => {
+elements.button.switchToJoin.addEventListener('click', () => {
     elements.modal.login.close();
     elements.modal.join.showModal();
 });
@@ -77,13 +85,13 @@ const login = async () => {
     };
 
     try {
-        const apiResponse = await sendRequest('/login', 'POST', loginData);
-        location.replace('/calendar');
+        await sendRequest('/login', 'POST', loginData);
+        location.replace('/goals/calendar');
     } catch (error) {
         elements.errorDiv.login.innerText = error.message;
     }
 }
 
-document.getElementById('loginIdCheckBtn').addEventListener('click', checkJoinId);
-document.getElementById('loginBtn').addEventListener('click', login);
-document.getElementById('joinBtn').addEventListener('click', join);
+elements.button.idCheck.addEventListener('click', checkJoinId);
+elements.button.login.addEventListener('click', login);
+elements.button.join.addEventListener('click', join);

@@ -23,10 +23,15 @@
     </div>
 </div>
 
-<dialog id="addGoalModal" class="modal">
+<dialog id="saveGoalModal" class="modal">
     <div class="modal-box !max-w-sm rounded-2xl">
         <form method="dialog" class="modal-form flex flex-col gap-4">
-            <h2>새 목표 추가</h2>
+            <div class="flex justify-between item-center">
+                <h2 id="modalTitle"></h2>
+                <button type="submit" class="btn btn-ghost btn-xs btn-circle">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
             <div class="flex gap-4 item-center">
                 <div class="flex item-center gap-1">
                     <input type="radio" id="daily" name="typeInput" class="radio radio-md radio-primary" value="DAILY"
@@ -62,10 +67,9 @@
                 </label>
             </fieldset>
             <input type="text" id="taskInput" class="input w-full" placeholder="목표 입력">
-            <input type="hidden" id="goalIdInput">
-            <div class="flex w-full gap-2">
-                <button type="submit" class="flex-1 btn">닫기</button>
-                <button type="button" id="addGoalBtn" class="flex-1 btn btn-outline btn-primary">추가</button>
+            <div id="goalModalBtnContainer" class="flex w-full gap-2">
+                <button type="button" id="deleteBtn" class="hidden btn flex-1">삭제</button>
+                <button type="button" id="saveGoalBtn" class="flex-1 btn btn-outline btn-primary">추가</button>
             </div>
         </form>
     </div>
@@ -81,9 +85,7 @@
         </button>
     </div>
 </div>
-<script src="https://unpkg.com/lucide@latest"></script>
-<script type="text/javascript" src="/js/modal.js"></script>
-<script type="text/javascript" src="/js/apiUtil.js"></script>
+<th:block th:replace="~{fragments/script :: common-script}"></th:block>
 </body>
 
 </html>

@@ -1,17 +1,16 @@
-import {clearModalInput} from './modal.js';
-import {sendRequest} from "./apiUtil.js";
+import {clearModalInput} from '/js/modal.js';
+import {sendRequest} from '/js/apiUtil.js';
+import {toast} from '/js/uiManager.js';
 
 let selectedDate = '';
 let calendar;
 
-lucide.createIcons();
-
 const elements = {
     modal: {
-        addGoal: document.getElementById('addGoalModal')
+        saveGoal: document.getElementById('saveGoalModal'),
+        title: document.getElementById('modalTitle')
     },
     input: {
-        id: document.getElementById('goalIdInput'),
         task: document.getElementById('taskInput'),
         startDate: document.getElementById('startDateInput'),
         dueDate: document.getElementById('dueDateInput'),
@@ -22,10 +21,17 @@ const elements = {
         getCheckedType: () => document.querySelector('input[name="typeInput"]:checked')
     },
     button: {
-        addGoal: document.getElementById('addGoalBtn'),
-        openAddGoal: document.getElementById('openAddGoalBtn')
+        saveGoal: document.getElementById('saveGoalBtn'),
+        openAddGoal: document.getElementById('openAddGoalBtn'),
+        delete: document.getElementById('deleteBtn')
     }
 };
+
+const apiMessage = {
+    add: "목표가 추가되었습니다!",
+    update: "목표가 수정되었습니다!",
+    delete: "목표가 삭제되었습니다!"
+}
 
 document.addEventListener('DOMContentLoaded', function () {
     const calendarEl = document.getElementById('calendar');
@@ -79,8 +85,6 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         },
         dateClick: function (info) {
-            clearModalInput();
-
             selectedDate = info.dateStr;
             elements.input.startDate.value = selectedDate;
             elements.input.type.daily.checked = true;
@@ -88,10 +92,10 @@ document.addEventListener('DOMContentLoaded', function () {
             const event = new Event('change');
             elements.input.startDate.dispatchEvent(event);
 
-            elements.modal.addGoal.showModal();
+            openGoalModal();
         },
         eventClick: function (info) {
-            elements.input.id.value = info.event.id;
+            elements.modal.saveGoal.dataset.id = info.event.id;
             elements.input.startDate.value = info.event.startStr;
             elements.input.task.value = info.event.title;
 
@@ -104,14 +108,14 @@ document.addEventListener('DOMContentLoaded', function () {
                     input.checked = true;
             });
 
-            elements.modal.addGoal.showModal();
+            openGoalModal();
         }
     });
     calendar.render();
 });
 
-elements.button.addGoal.addEventListener('click', async () => {
-    const goalId = elements.input.id.value;
+elements.button.saveGoal.addEventListener('click', async () => {
+    const goalId = elements.modal.saveGoal.dataset.id;
 
     const addGoalData = {
         task: elements.input.task.value,
@@ -124,13 +128,12 @@ elements.button.addGoal.addEventListener('click', async () => {
         const method = goalId ? 'PUT' : 'POST';
         const url = goalId ? `/goals/${goalId}` : '/goals'
 
-        const apiResponse = await sendRequest(url, method, addGoalData);
+        await sendRequest(url, method, addGoalData);
         calendar.refetchEvents();
-        elements.modal.addGoal.close();
-        alert(apiResponse.message);
+        elements.modal.saveGoal.close();
+        toast.success(goalId ? apiMessage.update : apiMessage.add);
     } catch (error) {
-        console.log(error.message);
-        alert(error.message);
+        toast.error(error.message);
     }
 });
 
@@ -185,9 +188,8 @@ elements.input.types.forEach(input => {
 
 const openAddGoal = () => {
     selectedDate = '';
-    clearModalInput();
     elements.input.type.daily.checked = true;
-    elements.modal.addGoal.showModal();
+    openGoalModal();
 }
 
 const determinePriority = (type) => {
@@ -203,5 +205,45 @@ const determinePriority = (type) => {
     }
 }
 
+const deleteGoal = async (id) => {
+    console.log(id);
+    if (!confirm("정말 삭제하시겠습니까?")) return;
+
+    try {
+        await sendRequest(`/goals/${id}`, 'DELETE');
+        calendar.refetchEvents();
+        elements.modal.saveGoal.close();
+        toast.success(apiMessage.delete);
+    } catch (error) {
+        toast.error(error.message);
+    }
+}
+
+const openGoalModal = () => {
+    const modal = elements.modal.saveGoal;
+    const saveBtn = elements.button.saveGoal;
+
+    const isUpdate = !!modal.dataset.id; //값이 있으면
+
+    elements.button.delete.classList.toggle('hidden', !isUpdate);
+
+    elements.modal.title.textContent = isUpdate ? '목표 수정' : '새 목표 추가';
+    saveBtn.textContent = isUpdate ? '수정' : '추가';
+
+    modal.showModal();
+};
+
+elements.modal.saveGoal.addEventListener('close', () => {
+    clearModalInput();
+    delete elements.modal.saveGoal.dataset.id;
+});
+
+elements.button.delete.addEventListener('click', async () => {
+    const goalId = elements.modal.saveGoal.dataset.id;
+
+    if (goalId) {
+        await deleteGoal(goalId);
+    }
+});
 elements.button.openAddGoal.addEventListener('click', openAddGoal);
 elements.input.dueDate.addEventListener('keydown', (e) => e.preventDefault());

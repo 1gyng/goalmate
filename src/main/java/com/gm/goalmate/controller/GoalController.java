@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
+@RequestMapping("/goals")
 public class GoalController {
 
     private final GoalService goalService;
@@ -30,7 +31,7 @@ public class GoalController {
         return "calendar";
     }
 
-    @GetMapping("/goals/today")
+    @GetMapping("/today")
     public String showList(@LoginUser User user, Model model) {
         model.addAttribute("dailyGoals", goalService.getTodayGoalsByType(user.getUserId(), GoalType.DAILY));
         model.addAttribute("weeklyGoals", goalService.getTodayGoalsByType(user.getUserId(), GoalType.WEEKLY));
@@ -40,34 +41,34 @@ public class GoalController {
         return "today-goal";
     }
 
-    @GetMapping("/goals")
+    @GetMapping
     public ResponseEntity<List<GoalResponse.Calendar>> getCalendarGoals(@LoginUser User user) {
         List<GoalResponse.Calendar> goals = goalService.getCalendarGoals(user.getUserId());
         return ResponseEntity.ok(goals);
     }
 
-    @PostMapping("/goals")
+    @PostMapping
     public ResponseEntity<?> addGoal(@Valid @RequestBody GoalRequest.Add request, @LoginUser User user) {
         Long goalId = goalService.addGoal(request, user.getUserId());
         return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("id", goalId, "message", "목표가 추가되었습니다!"));
     }
 
-    @DeleteMapping("/goals/{goalNum}")
+    @DeleteMapping("/{goalNum}")
     public ResponseEntity<?> deleteGoal(@PathVariable Long goalNum, @LoginUser User user) {
         goalService.deleteGoal(goalNum, user.getUserId());
-        return ResponseEntity.ok(Map.of("message", "목표가 삭제되었습니다!"));
+        return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/goals/{goalNum}")
+    @PutMapping("/{goalNum}")
     public ResponseEntity<?> updateGoal(@PathVariable Long goalNum, @Valid @RequestBody GoalRequest.Update request) {
         goalService.updateGoal(goalNum, request);
-        return ResponseEntity.ok(Map.of("message", "목표가 수정되었습니다!"));
+        return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/goals/{goalNum}/result")
+    @PatchMapping("/{goalNum}/result")
     public ResponseEntity<?> updateGoalResult(@PathVariable Long goalNum, @Valid @RequestBody GoalRequest.UpdateResult request, @LoginUser User user) {
         GoalResponse.Result result = goalService.updateGoalResult(goalNum, request, user.getUserId());
-        return ResponseEntity.ok(Map.of("result", result, "message", "결과가 저장되었습니다."));
+        return ResponseEntity.ok(result);
     }
 
 }
