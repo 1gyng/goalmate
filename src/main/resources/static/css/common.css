@@ -31,3 +31,11 @@ body {
 .goal-nav {
     background-color: #E9EFEC;
 }
+
+.nav-tooltip:before {
+    background-color: #3C4650 !important;
+}
+
+.nav-tooltip:after {
+    background-color: #3C4650 !important;
+}

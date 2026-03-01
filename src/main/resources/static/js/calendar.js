@@ -109,6 +109,12 @@ document.addEventListener('DOMContentLoaded', function () {
             });
 
             openGoalModal();
+        },
+        eventDidMount: function (info) {
+            if (info.event.extendedProps.type === 'DAILY') {
+                info.el.classList.add('tooltip', 'tooltip-top');
+                info.el.dataset.tip = info.event.title;
+            }
         }
     });
     calendar.render();

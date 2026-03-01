@@ -94,3 +94,16 @@
     display: none !important;
     -webkit-appearance: none;
 }
+
+.fc-scroller-harness {
+    overflow: visible !important;
+}
+
+.event-daily.tooltip:before {
+    background-color: #F9F6E6 !important;
+    color: rgb(52, 55, 52) !important;
+}
+
+.event-daily.tooltip:after {
+    background-color: #F9F6E6 !important;
+}
