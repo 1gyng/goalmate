@@ -22,6 +22,8 @@ public class UserService {
 
     @Transactional
     public void join(UserRequest.Join request) {
+        validateDuplicateLoginId(request.getLoginId());
+
         String encodedPassword = passwordEncoder.encode(request.getPassword());
 
         User user = User.builder()
@@ -34,22 +36,28 @@ public class UserService {
     }
 
     @Transactional
-    public User login(UserRequest.Login request) {
+    public UserResponse.LoginSession login(UserRequest.Login request) {
         User user = userRepository.findByLoginId(request.getLoginId())
                 .orElseThrow(() -> new IllegalArgumentException("아이디 또는 비밀번호가 일치하지 않습니다."));
 
-        if(!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
+        if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
             throw new IllegalArgumentException("아이디 또는 비밀번호가 일치하지 않습니다.");
         }
 
-        return user;
+        return UserResponse.LoginSession.builder()
+                .id(user.getUserId())
+                .nickname(user.getNickname())
+                .build();
     }
 
     public UserResponse.LoginIdCheck checkLoginId(String loginId) {
-        if(userRepository.existsByLoginId(loginId)) {
+        validateDuplicateLoginId(loginId);
+        return new UserResponse.LoginIdCheck(loginId, "사용할 수 있는 아이디입니다.");
+    }
+
+    private void validateDuplicateLoginId(String loginId) {
+        if (userRepository.existsByLoginId(loginId)) {
             throw new IllegalStateException("사용할 수 없는 아이디입니다.");
         }
-
-        return new UserResponse.LoginIdCheck(loginId, "사용할 수 있는 아이디입니다.");
     }
 }

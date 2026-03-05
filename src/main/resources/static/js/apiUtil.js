@@ -10,7 +10,8 @@ export const sendRequest = async (url, method, data) => {
 
     const response = await fetch(url, options);
 
-    const result = (response.status === 204) ? null : await response.json();
+    const text = await response.text();
+    const result = text ? JSON.parse(text) : null;
 
     if (!response.ok) {
         throw new Error(result.message);

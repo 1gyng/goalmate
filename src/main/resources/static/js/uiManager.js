@@ -20,11 +20,11 @@ export function clearModalInput() {
 }
 
 export const toast = {
-    success: (msg) => {
+    success: (msg, gravity) => {
         Toastify({
             text: msg,
             duration: 3000,
-            gravity: "top",
+            gravity: gravity ? gravity : "top",
             position: "right",
             style: {
                 background: "#E6F1EC",
@@ -32,6 +32,7 @@ export const toast = {
             }
         }).showToast();
     },
+
     error: (msg) => {
         Toastify({
             text: msg,

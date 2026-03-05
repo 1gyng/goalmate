@@ -12,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
@@ -48,25 +50,32 @@ public class GoalController {
     }
 
     @PostMapping
-    public ResponseEntity<?> addGoal(@Valid @RequestBody GoalRequest.Add request, @LoginUser User user) {
+    public ResponseEntity<Void> addGoal(@Valid @RequestBody GoalRequest.Add request, @LoginUser User user) {
         Long goalId = goalService.addGoal(request, user.getUserId());
-        return ResponseEntity.status(HttpStatus.CREATED).body(Map.of("id", goalId, "message", "목표가 추가되었습니다!"));
+
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{goalNum}").buildAndExpand(goalId).toUri();
+        return ResponseEntity.created(location).build();
     }
 
+/*    @GetMapping(/{goalNum})
+    public ResponseEntity<?> getGoal(@PathVariable Long goalNum, @LoginUser User user) {
+        return ResponseEntity.ok().build();
+    }*/
+
     @DeleteMapping("/{goalNum}")
-    public ResponseEntity<?> deleteGoal(@PathVariable Long goalNum, @LoginUser User user) {
+    public ResponseEntity<Void> deleteGoal(@PathVariable Long goalNum, @LoginUser User user) {
         goalService.deleteGoal(goalNum, user.getUserId());
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{goalNum}")
-    public ResponseEntity<?> updateGoal(@PathVariable Long goalNum, @Valid @RequestBody GoalRequest.Update request) {
+    public ResponseEntity<Void> updateGoal(@PathVariable Long goalNum, @Valid @RequestBody GoalRequest.Update request) {
         goalService.updateGoal(goalNum, request);
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{goalNum}/result")
-    public ResponseEntity<?> updateGoalResult(@PathVariable Long goalNum, @Valid @RequestBody GoalRequest.UpdateResult request, @LoginUser User user) {
+    public ResponseEntity<GoalResponse.Result> updateGoalResult(@PathVariable Long goalNum, @Valid @RequestBody GoalRequest.UpdateResult request, @LoginUser User user) {
         GoalResponse.Result result = goalService.updateGoalResult(goalNum, request, user.getUserId());
         return ResponseEntity.ok(result);
     }

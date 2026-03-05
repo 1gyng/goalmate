@@ -1,20 +1,18 @@
 package com.gm.goalmate.controller;
 
-import com.gm.goalmate.domain.user.User;
 import com.gm.goalmate.dto.UserRequest;
 import com.gm.goalmate.dto.UserResponse;
 import com.gm.goalmate.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import java.util.Map;
 
 @Controller
 public class UserController {
@@ -31,9 +29,9 @@ public class UserController {
     }
 
     @PostMapping("/join")
-    public ResponseEntity<?> join(@Valid @RequestBody UserRequest.Join request) {
+    public ResponseEntity<Void> join(@Valid @RequestBody UserRequest.Join request) {
         userService.join(request);
-        return ResponseEntity.ok(Map.of("message", "회원가입이 완료되었습니다!"));
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/login")
@@ -42,18 +40,22 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid @RequestBody UserRequest.Login request, HttpServletRequest httpServletRequest) {
-        User loginUser = userService.login(request);
+    public ResponseEntity<UserResponse.LoginInfo> login(@Valid @RequestBody UserRequest.Login request, HttpServletRequest httpServletRequest) {
+        UserResponse.LoginSession loginUser = userService.login(request);
 
         HttpSession session = httpServletRequest.getSession();
-        session.setAttribute("loginUser", loginUser);
+        session.setAttribute("loginUser", loginUser.getId());
 
-        return ResponseEntity.ok(Map.of("message", "로그인 성공"));
+        return ResponseEntity.ok(
+                UserResponse.LoginInfo.builder()
+                        .nickname(loginUser.getNickname())
+                        .build());
     }
 
     @GetMapping("/join/check-id/{loginId}")
     public ResponseEntity<UserResponse.LoginIdCheck> checkLoginId(@PathVariable String loginId) {
         UserResponse.LoginIdCheck loginIdCheck = userService.checkLoginId(loginId);
+
         return ResponseEntity.ok(loginIdCheck);
     }
 }

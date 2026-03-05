@@ -1,5 +1,6 @@
 import {sendRequest} from './apiUtil.js';
 import {clearModalInput} from './modal.js';
+import {toast} from '/js/uiManager.js';
 
 const elements = {
     modal: {
@@ -27,6 +28,11 @@ const elements = {
         login: document.getElementById('loginBtn'),
         join: document.getElementById('joinBtn')
     }
+};
+
+const apiMessage = {
+    login: (nickname) => `${nickname}님 오늘 목표를 확인해볼까요?`,
+    join: "회원가입이 완료되었습니다!"
 };
 
 elements.button.loginModal.addEventListener('click', () => {
@@ -70,9 +76,9 @@ const join = async () => {
     };
 
     try {
-        const apiResponse = await sendRequest('/join', 'POST', joinData);
-        alert(apiResponse.message);
-        location.replace('/');
+        await sendRequest('/join', 'POST', joinData);
+        elements.modal.join.close();
+        toast.success(apiMessage.join, "bottom");
     } catch (error) {
         elements.errorDiv.join.innerText = error.message;
     }
@@ -85,8 +91,12 @@ const login = async () => {
     };
 
     try {
-        await sendRequest('/login', 'POST', loginData);
-        location.replace('/goals/calendar');
+        const apiResponse = await sendRequest('/login', 'POST', loginData);
+        elements.modal.login.close();
+        toast.success(apiMessage.login(apiResponse.nickname), "bottom");
+        setTimeout(() => {
+            location.replace('/goals/calendar');
+        }, 1500);
     } catch (error) {
         elements.errorDiv.login.innerText = error.message;
     }
