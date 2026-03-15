@@ -1,0 +1,18 @@
+#emotion-container input[type=radio] {
+    display: none;
+}
+
+#emotion-container input[type="radio"]:checked + .emotion-label {
+    background-color: white;
+    border: 3px solid #657899;
+    border-radius: 1rem;
+}
+
+.emotion-tooltip:before {
+    background-color: #657899 !important;
+    color: white !important;
+}
+
+.emotion-tooltip:after {
+    background-color: #657899 !important;
+}

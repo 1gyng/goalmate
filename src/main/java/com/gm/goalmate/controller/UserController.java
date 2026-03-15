@@ -55,7 +55,6 @@ public class UserController {
     @GetMapping("/join/check-id/{loginId}")
     public ResponseEntity<UserResponse.LoginIdCheck> checkLoginId(@PathVariable String loginId) {
         UserResponse.LoginIdCheck loginIdCheck = userService.checkLoginId(loginId);
-
         return ResponseEntity.ok(loginIdCheck);
     }
 }

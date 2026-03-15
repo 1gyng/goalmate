@@ -21,7 +21,7 @@ const elements = {
         getCheckedType: () => document.querySelector('input[name="typeInput"]:checked')
     },
     button: {
-        saveGoal: document.getElementById('saveGoalBtn'),
+        saveGoal: document.getElementById('saveBtn'),
         openAddGoal: document.getElementById('openAddGoalBtn'),
         delete: document.getElementById('deleteBtn')
     }
@@ -31,7 +31,7 @@ const apiMessage = {
     add: "목표가 추가되었습니다!",
     update: "목표가 수정되었습니다!",
     delete: "목표가 삭제되었습니다!"
-}
+};
 
 document.addEventListener('DOMContentLoaded', function () {
     const calendarEl = document.getElementById('calendar');
@@ -212,7 +212,6 @@ const determinePriority = (type) => {
 }
 
 const deleteGoal = async (id) => {
-    console.log(id);
     if (!confirm("정말 삭제하시겠습니까?")) return;
 
     try {

@@ -3,6 +3,7 @@ package com.gm.goalmate.config;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.ViewControllerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import java.util.List;
@@ -14,6 +15,11 @@ public class WebConfig implements WebMvcConfigurer {
 
     public WebConfig(LoginUserArgumentResolver loginUserArgumentResolver) {
         this.loginUserArgumentResolver = loginUserArgumentResolver;
+    }
+
+    @Override
+    public void addViewControllers(ViewControllerRegistry registry) {
+        registry.addViewController("/").setViewName("index");
     }
 
     @Override

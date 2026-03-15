@@ -69,8 +69,8 @@ public class GoalController {
     }
 
     @PutMapping("/{goalNum}")
-    public ResponseEntity<Void> updateGoal(@PathVariable Long goalNum, @Valid @RequestBody GoalRequest.Update request) {
-        goalService.updateGoal(goalNum, request);
+    public ResponseEntity<Void> updateGoal(@PathVariable Long goalNum, @Valid @RequestBody GoalRequest.Update request, @LoginUser User user) {
+        goalService.updateGoal(goalNum, request, user.getUserId());
         return ResponseEntity.noContent().build();
     }
 

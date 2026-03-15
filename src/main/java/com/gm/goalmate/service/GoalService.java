@@ -5,9 +5,7 @@ import com.gm.goalmate.domain.user.User;
 import com.gm.goalmate.domain.user.UserRepository;
 import com.gm.goalmate.dto.GoalRequest;
 import com.gm.goalmate.dto.GoalResponse;
-import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -16,7 +14,6 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class GoalService {
@@ -53,8 +50,9 @@ public class GoalService {
     }
 
     @Transactional
-    public void updateGoal(Long goalNum, GoalRequest.Update request) {
+    public void updateGoal(Long goalNum, GoalRequest.Update request, Long userId) {
         Goal goal = findGoalByGoalId(goalNum);
+        validateWriter(goal, userId);
         goal.update(request);
     }
 
@@ -106,13 +104,14 @@ public class GoalService {
                         .build())
                 .toList();
     }
+
     private Goal findGoalByGoalId(Long goalNum) {
         return goalRepository.findById(goalNum)
                 .orElseThrow(() -> new IllegalArgumentException("해당 목표를 찾을 수 없습니다."));
     }
 
     private void validateWriter(Goal goal, Long userId) {
-        if(!goal.getUser().getUserId().equals(userId)) { //작성자 = 로그인한 사용자
+        if (!goal.getUser().getUserId().equals(userId)) { //작성자 = 로그인한 사용자
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "권한이 없습니다.");
         }
     }
