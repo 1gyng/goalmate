@@ -80,14 +80,18 @@ public class GoalService {
                 .build();
     }
 
-    public GoalResponse.ListSimple getTodayGoalsByType(Long userId, GoalType type) {
-        LocalDate startDate = getStartDate(type);
-        LocalDate dueDate = getDueDate(type);
+    public List<GoalResponse.Item> getTodayGoalItemList(Long userId, GoalType type) {
+        LocalDate today = LocalDate.now();
+        return getGoalItemsByDate(userId, type, today);
+    }
 
-        List<Goal> goals = goalRepository.findAllByUser_UserIdAndStartDateBetweenAndType(userId, startDate, dueDate, type);
-        List<GoalResponse.ListItem> items = mapToListItems(goals);
+    public GoalResponse.Summary getTodayGoalSummary(Long userId, GoalType type) {
+        LocalDate today = LocalDate.now();
+        LocalDate startDate = getStartDate(type, today);
+        LocalDate dueDate = getDueDate(type, today);
+        List<GoalResponse.Item> items = getGoalItemsByPeriod(userId, type, startDate, dueDate);
 
-        return GoalResponse.ListSimple.builder()
+        return GoalResponse.Summary.builder()
                 .items(items)
                 .type(type)
                 .startDate(startDate)
@@ -95,14 +99,16 @@ public class GoalService {
                 .build();
     }
 
-    private List<GoalResponse.ListItem> mapToListItems(List<Goal> goals) {
-        return goals.stream()
-                .map(goal -> GoalResponse.ListItem.builder()
-                        .id(goal.getGoalId())
-                        .task(goal.getTask())
-                        .result(goal.getResult())
-                        .build())
-                .toList();
+    private List<GoalResponse.Item> getGoalItemsByDate(Long userId, GoalType type, LocalDate date) {
+        LocalDate startDate = getStartDate(type, date);
+        LocalDate dueDate = getDueDate(type, date);
+
+        return getGoalItemsByPeriod(userId, type, startDate, dueDate);
+    }
+
+    private List<GoalResponse.Item> getGoalItemsByPeriod(Long userId, GoalType type, LocalDate startDate, LocalDate dueDate) {
+        List<Goal> goals = goalRepository.findAllByUser_UserIdAndStartDateBetweenAndType(userId, startDate, dueDate, type);
+        return GoalResponse.Item.from(goals);
     }
 
     private Goal findGoalByGoalId(Long goalNum) {
@@ -116,25 +122,21 @@ public class GoalService {
         }
     }
 
-    private LocalDate getStartDate(GoalType type) {
-        LocalDate today = LocalDate.now();
-
+    private LocalDate getStartDate(GoalType type, LocalDate baseDate) {
         return switch (type) {
-            case DAILY -> today;
-            case WEEKLY -> today.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
-            case MONTHLY -> today.with(TemporalAdjusters.firstDayOfMonth());
-            case YEARLY -> today.with(TemporalAdjusters.firstDayOfYear());
+            case DAILY -> baseDate;
+            case WEEKLY -> baseDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
+            case MONTHLY -> baseDate.with(TemporalAdjusters.firstDayOfMonth());
+            case YEARLY -> baseDate.with(TemporalAdjusters.firstDayOfYear());
         };
     }
 
-    private LocalDate getDueDate(GoalType type) {
-        LocalDate today = LocalDate.now();
-
+    private LocalDate getDueDate(GoalType type, LocalDate baseDate) {
         return switch (type) {
-            case DAILY -> today;
-            case WEEKLY -> today.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY));
-            case MONTHLY -> today.with(TemporalAdjusters.lastDayOfMonth());
-            case YEARLY -> today.with(TemporalAdjusters.lastDayOfYear());
+            case DAILY -> baseDate;
+            case WEEKLY -> baseDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY));
+            case MONTHLY -> baseDate.with(TemporalAdjusters.lastDayOfMonth());
+            case YEARLY -> baseDate.with(TemporalAdjusters.lastDayOfYear());
         };
     }
 }

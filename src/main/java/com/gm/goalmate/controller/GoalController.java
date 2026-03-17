@@ -35,10 +35,10 @@ public class GoalController {
 
     @GetMapping("/today")
     public String showList(@LoginUser User user, Model model) {
-        model.addAttribute("dailyGoals", goalService.getTodayGoalsByType(user.getUserId(), GoalType.DAILY));
-        model.addAttribute("weeklyGoals", goalService.getTodayGoalsByType(user.getUserId(), GoalType.WEEKLY));
-        model.addAttribute("monthlyGoals", goalService.getTodayGoalsByType(user.getUserId(), GoalType.MONTHLY));
-        model.addAttribute("yearlyGoals", goalService.getTodayGoalsByType(user.getUserId(), GoalType.YEARLY));
+        model.addAttribute("dailyGoals", goalService.getTodayGoalSummary(user.getUserId(), GoalType.DAILY));
+        model.addAttribute("weeklyGoals", goalService.getTodayGoalSummary(user.getUserId(), GoalType.WEEKLY));
+        model.addAttribute("monthlyGoals", goalService.getTodayGoalSummary(user.getUserId(), GoalType.MONTHLY));
+        model.addAttribute("yearlyGoals", goalService.getTodayGoalSummary(user.getUserId(), GoalType.YEARLY));
 
         return "today-goal";
     }
