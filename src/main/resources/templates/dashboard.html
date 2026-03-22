@@ -8,6 +8,7 @@
 
         <script src="https://d3js.org/d3.v7.min.js"></script>
         <script src="https://unpkg.com/cal-heatmap/dist/cal-heatmap.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     </th:block>
 </head>
 
@@ -19,36 +20,64 @@
 
         <div class="flex-1 overflow-y-auto">
             <div class="card bg-base-100 shadow-sm border border-base-200 m-12 overflow-hidden">
-                <div class="card-body p-5 flex flex-row items-start gap-8 overflow-x-auto">
-                    <div class="flex flex-col w-fit">
-                        <h2>하루 기록</h2>
-                        <div class="flex justify-between item-center">
-                            <div class="badge badge-neutral badge-dash">
-                                <span id="year-span" class="tracking-[0.1em]"></span>
-                            </div>
-                            <div id="year-btn-container">
-                                <button id="year-left-btn" class="btn btn-ghost p-0">
-                                    <i data-lucide="square-chevron-left" class="w-6 h-6"></i>
-                                </button>
-                                <button id="year-right-btn" class="btn btn-ghost p-0">
-                                    <i data-lucide="square-chevron-right" class="w-6 h-6"></i>
-                                </button>
-                            </div>
-                        </div>
-                        <div id="cal-heatmap"></div>
+                <div class="card-body p-5">
+                    <div class="flex justify-between items-center">
+                        <h2 class="card-title text-primary text-lg">📅 오늘의 일간 목표</h2>
+                        <a th:href="@{/goals/today}">오늘의 목표 전체보기</a>
+                        <span class="badge badge-outline" th:text="|${#lists.size(dailyGoals)} / 3|"></span>
                     </div>
-                    <div id="daily-record-container" class="flex-1 gap-3">
-                        <div>
-                            <form>
+                    <div>
+                        <ul class="menu w-full bg-base-200 rounded-box gap-1">
+                            <li th:if="${#lists.isEmpty(dailyGoals)}">등록된 일간 목표가 없어요!</li>
+                            <li th:unless="${#lists.isEmpty(dailyGoals)}"
+                                th:each="goal : ${dailyGoals}">
+                                <label class="goal-item-btn justify-start font-normal"
+                                       th:data-id="${goal.id}"
+                                       th:data-result="${goal.result}">
+                                    <input type="checkbox" class="checkbox"
+                                           th:checked="${goal.result.name() == 'SUCCESS'}">
+                                    <span th:text="${goal.task}">목표 제목</span>
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div>
+                <canvas id="emotion-chart"></canvas>
+            </div>
+            <div>
+                <div class="card bg-base-100 shadow-sm border border-base-200 m-12 overflow-hidden">
+                    <div class="card-body p-5 flex flex-row items-start gap-8 overflow-x-auto">
+                        <div class="flex flex-col w-fit">
+                            <h2>하루 기록</h2>
+                            <div class="flex justify-between item-center">
                                 <div class="badge badge-neutral badge-dash">
-                                    <i data-lucide="notebook-text" class="w-4 h-4"></i>
-                                    <span id="record-date-span"></span>
+                                    <span id="year-span" class="tracking-[0.1em]"></span>
                                 </div>
-                                <div id="emotion-container" class="pb-2">
-                                    <fieldset class="fieldset flex gap-1 rounded-box border p-2 border-base-300">
-                                        <legend class="fieldset-legend">감정 선택</legend>
-                                        <span class="tooltip emotion-tooltip" th:each="emo : ${emotions}"
-                                              th:data-tip="${emo.description}">
+                                <div id="year-btn-container">
+                                    <button id="year-left-btn" class="btn btn-ghost p-0">
+                                        <i data-lucide="square-chevron-left" class="w-6 h-6"></i>
+                                    </button>
+                                    <button id="year-right-btn" class="btn btn-ghost p-0">
+                                        <i data-lucide="square-chevron-right" class="w-6 h-6"></i>
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="cal-heatmap"></div>
+                        </div>
+                        <div id="daily-record-container" class="flex-1 gap-3">
+                            <div>
+                                <form>
+                                    <div class="badge badge-neutral badge-dash">
+                                        <i data-lucide="notebook-text" class="w-4 h-4"></i>
+                                        <span id="record-date-span"></span>
+                                    </div>
+                                    <div id="emotion-container" class="pb-2">
+                                        <fieldset class="fieldset flex gap-1 rounded-box border p-2 border-base-300">
+                                            <legend class="fieldset-legend">감정 선택</legend>
+                                            <span class="tooltip emotion-tooltip" th:each="emo : ${emotions}"
+                                                  th:data-tip="${emo.description}">
                                         <input type="radio" th:id="|emo-${emo.name()}|" name="selectedEmotion"
                                                th:value="${emo.name()}">
                                         <label th:for="|emo-${emo.name()}|"
@@ -56,27 +85,28 @@
                                             <span class="emotion-icon" th:data-emotion="${emo.name()}"></span>
                                         </label>
                                     </span>
-                                    </fieldset>
-                                </div>
-                                <div>
-                                    <div class="relative">
-                                <textarea id="record-content" class="textarea w-full mb-2 resize-y overflow-hidden pb-8"
-                                          maxlength="50" placeholder="오늘 하루는 어땠나요?"></textarea>
-                                        <div class="absolute bottom-2 right-3 text-xs mb-2 text-base-content/50">
-                                            <span id="char-count">0</span> / 50
+                                        </fieldset>
+                                    </div>
+                                    <div>
+                                        <div class="relative">
+                                            <textarea id="record-content"
+                                                      class="textarea w-full mb-2 resize-y overflow-hidden pb-8"
+                                                      maxlength="50" placeholder="오늘 하루는 어땠나요?"></textarea>
+                                            <div class="absolute bottom-2 right-3 text-xs mb-2 text-base-content/50">
+                                                <span id="char-count">0</span> / 50
+                                            </div>
+                                        </div>
+                                        <div class="flex gap-2 justify-end">
+                                            <span id="updated-at-text"></span>
+                                            <button type="button" id="delete-btn" class="btn rounded-full hidden">삭제
+                                            </button>
+                                            <button type="button" id="save-btn"
+                                                    class="btn btn-outline btn-primary rounded-full">추가
+                                            </button>
                                         </div>
                                     </div>
-
-                                    <div class="flex gap-2 justify-end">
-                                        <span id="updated-at-text"></span>
-                                        <button type="button" id="delete-btn" class="btn rounded-full hidden">삭제
-                                        </button>
-                                        <button type="button" id="save-btn"
-                                                class="btn btn-outline btn-primary rounded-full">추가
-                                        </button>
-                                    </div>
-                                </div>
-                            </form>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -86,7 +116,6 @@
 </div>
 
 <th:block th:replace="~{fragments/script :: common-script}"></th:block>
-</body>
 <script type="module">
     import {sendRequest} from '/js/apiUtil.js';
     import {toast} from '/js/uiManager.js';
@@ -343,4 +372,88 @@
 
 </script>
 
+</body>
+<script th:inline="javascript">
+    const EmotionIcon = {
+        PROUD: "😎",
+        EXCITED: "😆",
+        GRATEFUL: "🥰",
+        NEUTRAL: "😐",
+        ANXIOUS: "😰",
+        TIRED: "🫠",
+        FRUSTRATED: "😖",
+        SAD: "😭",
+        UNRECORDED: "❔"
+    };
+    const emotionChart = document.getElementById('emotion-chart');
+
+    const emotionStatData = [
+        /*[# th:each="emo : ${emotionStat}"]*/
+        {
+            name: /*[[${emo.name}]]*/ '이름',
+            description: /*[[${emo.description}]]*/ '설명',
+            count: /*[[${emo.count}]]*/ '횟수',
+            successRate: /*[[${emo.successRate}]]*/ '달성률'
+        },
+        /*[/]*/
+    ];
+
+    const emotionChartLabels = emotionStatData.map(e => {
+        return `${EmotionIcon[e.name]} ${e.description}`;
+    });
+
+    const emotionCounts = emotionStatData.map(e => {
+        return e.count;
+    });
+
+    const successRate = emotionStatData.map(e => {
+        return e.successRate;
+    });
+
+    new Chart(emotionChart, {
+        data: {
+            labels: emotionChartLabels,
+            datasets: [
+                {
+                    type: 'bar',
+                    label: '횟수',
+                    data: emotionCounts,
+                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                    yAxisID: 'y',
+                },
+                {
+                    type: 'line',
+                    label: '목표 달성률 (%)',
+                    data: successRate,
+                    borderColor: 'rgb(255, 99, 132)',
+                    backgroundColor: 'rgb(255, 99, 132)',
+                    borderWidth: 3,
+                    fill: false,
+                    yAxisID: 'y1',
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    beginAtZero: true,
+                    title: {display: true, text: '기록 횟수'}
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    min: 0,
+                    max: 100,
+                    grid: {drawOnChartArea: false},
+                    title: {display: true, text: '달성률 (%)'}
+                }
+            }
+        }
+    });
+</script>
 </html>

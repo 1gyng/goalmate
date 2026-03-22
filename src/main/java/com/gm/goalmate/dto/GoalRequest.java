@@ -49,5 +49,8 @@ public class GoalRequest {
     public static class UpdateResult {
         @NotNull(message = "결과를 선택해주세요.")
         private GoalResult result;
+
+        @NotNull(message = "실제 목표 완료일을 선택해주세요.")
+        private LocalDate resultDate;
     }
 }

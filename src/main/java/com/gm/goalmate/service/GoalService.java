@@ -1,5 +1,6 @@
 package com.gm.goalmate.service;
 
+import com.gm.goalmate.domain.common.DateRange;
 import com.gm.goalmate.domain.goal.*;
 import com.gm.goalmate.domain.user.User;
 import com.gm.goalmate.domain.user.UserRepository;
@@ -10,9 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 @Service
@@ -72,8 +71,9 @@ public class GoalService {
     @Transactional
     public GoalResponse.Result updateGoalResult(Long goalNum, GoalRequest.UpdateResult request, Long userId) {
         Goal goal = findGoalByGoalId(goalNum);
+        LocalDate today = LocalDate.now();
         validateWriter(goal, userId);
-        goal.updateResult(request);
+        goal.updateResult(request, today);
 
         return GoalResponse.Result.builder()
                 .result(goal.getResult())
@@ -87,23 +87,21 @@ public class GoalService {
 
     public GoalResponse.Summary getTodayGoalSummary(Long userId, GoalType type) {
         LocalDate today = LocalDate.now();
-        LocalDate startDate = getStartDate(type, today);
-        LocalDate dueDate = getDueDate(type, today);
-        List<GoalResponse.Item> items = getGoalItemsByPeriod(userId, type, startDate, dueDate);
+        DateRange period = DateRange.of(type, today);
+        List<GoalResponse.Item> items = getGoalItemsByPeriod(userId, type, period.startDate(), period.dueDate());
 
         return GoalResponse.Summary.builder()
                 .items(items)
                 .type(type)
-                .startDate(startDate)
-                .dueDate(dueDate)
+                .startDate(period.startDate())
+                .dueDate(period.dueDate())
                 .build();
     }
 
     private List<GoalResponse.Item> getGoalItemsByDate(Long userId, GoalType type, LocalDate date) {
-        LocalDate startDate = getStartDate(type, date);
-        LocalDate dueDate = getDueDate(type, date);
+        DateRange period = DateRange.of(type, date);
 
-        return getGoalItemsByPeriod(userId, type, startDate, dueDate);
+        return getGoalItemsByPeriod(userId, type, period.startDate(), period.dueDate());
     }
 
     private List<GoalResponse.Item> getGoalItemsByPeriod(Long userId, GoalType type, LocalDate startDate, LocalDate dueDate) {
@@ -120,23 +118,5 @@ public class GoalService {
         if (!goal.getUser().getUserId().equals(userId)) { //작성자 = 로그인한 사용자
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "권한이 없습니다.");
         }
-    }
-
-    private LocalDate getStartDate(GoalType type, LocalDate baseDate) {
-        return switch (type) {
-            case DAILY -> baseDate;
-            case WEEKLY -> baseDate.with(TemporalAdjusters.previousOrSame(DayOfWeek.SUNDAY));
-            case MONTHLY -> baseDate.with(TemporalAdjusters.firstDayOfMonth());
-            case YEARLY -> baseDate.with(TemporalAdjusters.firstDayOfYear());
-        };
-    }
-
-    private LocalDate getDueDate(GoalType type, LocalDate baseDate) {
-        return switch (type) {
-            case DAILY -> baseDate;
-            case WEEKLY -> baseDate.with(TemporalAdjusters.nextOrSame(DayOfWeek.SATURDAY));
-            case MONTHLY -> baseDate.with(TemporalAdjusters.lastDayOfMonth());
-            case YEARLY -> baseDate.with(TemporalAdjusters.lastDayOfYear());
-        };
     }
 }
