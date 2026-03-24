@@ -9,7 +9,7 @@ import java.util.List;
 public interface GoalRepository extends JpaRepository<Goal, Long> {
     List<Goal> findAllByUserUserId(Long userId);
 
-    List<Goal> findAllByUser_UserIdAndStartDateBetweenAndType(Long userId, LocalDate startDate, LocalDate dueDate, GoalType type);
+    List<Goal> findAllByUser_UserIdAndDateRange_StartDateBetweenAndType(Long userId, LocalDate startDate, LocalDate dueDate, GoalType type);
 
     @Query(value = "SELECT COALESCE(d.emotion, 'UNRECORDED') AS name, ROUND(SUM(IF(g.result = 'SUCCESS',1, 0)) / COUNT(g.goal_id), 1) AS success_rate FROM goal g " +
             "LEFT JOIN daily_record d ON g.user_id = d.user_id AND COALESCE(g.result_date, g.due_date) = d.record_date WHERE g.user_id = :userId " +

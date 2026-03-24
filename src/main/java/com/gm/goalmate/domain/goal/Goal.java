@@ -1,19 +1,16 @@
 package com.gm.goalmate.domain.goal;
 
+import com.gm.goalmate.domain.common.DateRange;
 import com.gm.goalmate.domain.user.User;
 import com.gm.goalmate.dto.GoalRequest;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
 @Entity
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Goal {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,13 +29,8 @@ public class Goal {
 
     private LocalDate resultDate;
 
-    @Column(nullable = false)
-    @Temporal(value = TemporalType.DATE)
-    private LocalDate startDate; //시작일
-
-    @Column(nullable = false)
-    @Temporal(value = TemporalType.DATE)
-    private LocalDate dueDate; //종료일
+    @Embedded
+    private DateRange dateRange;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
@@ -46,20 +38,16 @@ public class Goal {
 
     @Builder
     public Goal(String task, GoalType type, LocalDate startDate, LocalDate dueDate, User user) {
-        validateDateRange(startDate, dueDate);
-
         this.task = task;
         this.type = type;
-        this.startDate = startDate;
-        this.dueDate = dueDate;
+        this.dateRange = new DateRange(startDate, dueDate);
         this.user = user;
     }
 
     public void update(GoalRequest.Update request) {
         this.type = request.getType();
         this.task = request.getTask();
-        this.startDate = request.getStartDate();
-        this.dueDate = request.getDueDate();
+        this.dateRange = new DateRange(request.getStartDate(), request.getDueDate());
     }
 
     public void updateResult(GoalRequest.UpdateResult request, LocalDate date) {
@@ -67,12 +55,6 @@ public class Goal {
         validateResult(result);
         this.result = result;
         this.resultDate = date;
-    }
-
-    private void validateDateRange(LocalDate startDate, LocalDate dueDate) {
-        if (dueDate.isBefore(startDate)) {
-            throw new IllegalArgumentException("종료일은 시작일보다 빠를 수 없습니다.");
-        }
     }
 
     private void validateResult(GoalResult result) {

@@ -1,12 +1,18 @@
 package com.gm.goalmate.domain.common;
 
 import com.gm.goalmate.domain.goal.GoalType;
+import jakarta.persistence.Column;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.TemporalAdjusters;
 
-public record DateRange(LocalDate startDate, LocalDate dueDate) {
+public record DateRange(
+        @Column(nullable = false)
+        LocalDate startDate,
+        @Column(nullable = false)
+        LocalDate dueDate
+) {
 
     public DateRange {
         validate(startDate, dueDate);

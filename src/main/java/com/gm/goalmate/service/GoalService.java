@@ -61,8 +61,8 @@ public class GoalService {
                 .map(goal -> GoalResponse.Calendar.builder()
                         .id(goal.getGoalId())
                         .task(goal.getTask())
-                        .startDate(goal.getStartDate())
-                        .dueDate(goal.getDueDate())
+                        .startDate(goal.getDateRange().startDate())
+                        .dueDate(goal.getDateRange().dueDate())
                         .type(goal.getType())
                         .build())
                 .toList();
@@ -105,7 +105,7 @@ public class GoalService {
     }
 
     private List<GoalResponse.Item> getGoalItemsByPeriod(Long userId, GoalType type, LocalDate startDate, LocalDate dueDate) {
-        List<Goal> goals = goalRepository.findAllByUser_UserIdAndStartDateBetweenAndType(userId, startDate, dueDate, type);
+        List<Goal> goals = goalRepository.findAllByUser_UserIdAndDateRange_StartDateBetweenAndType(userId, startDate, dueDate, type);
         return GoalResponse.Item.from(goals);
     }
 
