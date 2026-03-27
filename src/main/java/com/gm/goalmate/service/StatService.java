@@ -7,6 +7,7 @@ import com.gm.goalmate.domain.dailyRecord.EmotionCount;
 import com.gm.goalmate.domain.goal.EmotionSuccessRate;
 import com.gm.goalmate.domain.goal.GoalRepository;
 import com.gm.goalmate.domain.goal.GoalType;
+import com.gm.goalmate.domain.goal.TypeSuccessRate;
 import com.gm.goalmate.dto.StatResponse;
 import org.springframework.stereotype.Service;
 
@@ -31,41 +32,69 @@ public class StatService {
         List<EmotionCount> counts = dailyRecordRepository.countEmotion(userId, period.startDate(), period.dueDate());
         List<EmotionSuccessRate> rates = goalRepository.findSuccessRateGroupByEmotion(userId, period.startDate(), period.dueDate());
 
-        long recordCount = counts.stream().mapToLong(EmotionCount::getCount).sum();
+        Map<Emotion, StatResponse.EmotionStat> statMap = buildEmotionStatMap(counts, rates);
 
-        Map<String, StatResponse.EmotionStat> statMap = buildEmotionStatMap(counts, rates);
-        updateUnrecordedCount(statMap, totalDays, recordCount);
+        List<StatResponse.EmotionStat> finalStat = new ArrayList<>(statMap.values());
+        finalStat.add(createUnrecordedCount(counts, rates, totalDays));
 
+        return finalStat;
+    }
+
+    public List<StatResponse.SuccessRateStat> getMonthlySuccessRateStat(Long userId) {
+        DateRange period = DateRange.of(GoalType.MONTHLY, LocalDate.now());
+        List<TypeSuccessRate> rates = goalRepository.findSuccessRateGroupByType(userId, period.startDate(), period.dueDate());
+
+        Map<GoalType, StatResponse.SuccessRateStat> statMap = createSuccessRateStatMap(rates);
         return new ArrayList<>(statMap.values());
     }
 
-    private Map<String, StatResponse.EmotionStat> buildEmotionStatMap(List<EmotionCount> counts, List<EmotionSuccessRate> rates) {
-        Map<String, StatResponse.EmotionStat> statMap = new LinkedHashMap<>();
-
-        for (Emotion emotion : Emotion.values()) {
-            statMap.put(emotion.name(), new StatResponse.EmotionStat(emotion.name(), emotion.getDescription(), 0L, 0.0));
+    private Map<GoalType, StatResponse.SuccessRateStat> createSuccessRateStatMap(List<TypeSuccessRate> rates) {
+        Map<GoalType, StatResponse.SuccessRateStat> statMap = new EnumMap<>(GoalType.class);
+        for (GoalType type : GoalType.values()) {
+            statMap.put(type, StatResponse.SuccessRateStat.init(type));
         }
-        statMap.put("UNRECORDED", new StatResponse.EmotionStat("UNRECORDED", "기록 없음", 0L, 0.0));
-
-
-        counts.forEach(c -> {
-            statMap.computeIfPresent(c.getName(), (key, existing) ->
-                    new StatResponse.EmotionStat(key, existing.getDescription(), c.getCount(), existing.getSuccessRate()));
-        });
 
         rates.forEach(r -> {
-            statMap.computeIfPresent(r.getName(), (key, existing) ->
-                    new StatResponse.EmotionStat(key, existing.getDescription(), existing.getCount(), r.getSuccessRate()));
+            if(r.getType() != null) {
+                statMap.put(r.getType(), new StatResponse.SuccessRateStat(r.getType(), r.getSuccessRate(), r.getSuccessCount(), r.getTotalCount()));
+            }
         });
 
         return statMap;
     }
 
-    private void updateUnrecordedCount(Map<String, StatResponse.EmotionStat> statMap, int totalDays, long recordCount) {
-        long unrecordedCount = (long) totalDays - recordCount;
+    private Map<Emotion, StatResponse.EmotionStat> buildEmotionStatMap(List<EmotionCount> counts, List<EmotionSuccessRate> rates) {
+        Map<Emotion, StatResponse.EmotionStat> statMap = new EnumMap<>(Emotion.class);
 
-        statMap.computeIfPresent("UNRECORDED", (key, existing) ->
-                new StatResponse.EmotionStat(key, existing.getDescription(), unrecordedCount, existing.getSuccessRate())
-        );
+        for (Emotion emotion : Emotion.values()) {
+            statMap.put(emotion, StatResponse.EmotionStat.init(emotion));
+        }
+
+        counts.forEach(c -> {
+            Emotion emotion = Emotion.valueOf(c.getName());
+            statMap.computeIfPresent(emotion, (key, existing) ->
+                    new StatResponse.EmotionStat(key.name(), existing.getDescription(), c.getRecordedCount(), existing.getSuccessRate()));
+        });
+
+        rates.forEach(r -> {
+            if (StatResponse.UNRECORDED_KEY.equals(r.getName())) {
+                return;
+            }
+
+            Emotion emotion = Emotion.valueOf(r.getName());
+            statMap.computeIfPresent(emotion, (key, existing) ->
+                    new StatResponse.EmotionStat(key.name(), existing.getDescription(), existing.getRecordedCount(), r.getSuccessRate()));
+        });
+
+        return statMap;
     }
+
+    private StatResponse.EmotionStat createUnrecordedCount(List<EmotionCount> counts, List<EmotionSuccessRate> rates, int totalDays) {
+        long recordedCount = counts.stream().mapToLong(EmotionCount::getRecordedCount).sum();
+        long unrecordedCount = (long) totalDays - recordedCount;
+        double rate = rates.stream().filter(r -> StatResponse.UNRECORDED_KEY.equals(r.getName())).map(EmotionSuccessRate::getSuccessRate).findFirst().orElse(0.0);
+
+        return new StatResponse.EmotionStat(StatResponse.UNRECORDED_KEY, StatResponse.UNRECORDED_DESCRIPTION, unrecordedCount, rate);
+    }
+
 }

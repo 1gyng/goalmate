@@ -11,6 +11,6 @@ public interface DailyRecordRepository extends JpaRepository<DailyRecord, Long> 
 
     List<DailyRecord> findAllByUser_userIdAndRecordDateBetween(Long userUserId, LocalDate recordDateAfter, LocalDate recordDateBefore);
 
-    @Query(value = "SELECT d.emotion AS name, COUNT(*) AS count FROM daily_record d WHERE d.user_id = :userId AND d.record_date BETWEEN :first AND :last GROUP BY d.emotion", nativeQuery = true)
+    @Query(value = "SELECT d.emotion AS name, COUNT(*) AS recorded_count FROM daily_record d WHERE d.user_id = :userId AND d.record_date BETWEEN :first AND :last GROUP BY d.emotion", nativeQuery = true)
     List<EmotionCount> countEmotion(Long userId, LocalDate first, LocalDate last);
 }
