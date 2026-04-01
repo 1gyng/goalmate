@@ -1,6 +1,5 @@
-package com.gm.goalmate.domain.common;
+package com.gm.goalmate.domain.goal;
 
-import com.gm.goalmate.domain.goal.GoalType;
 import jakarta.persistence.Column;
 
 import java.time.DayOfWeek;
@@ -18,7 +17,11 @@ public record DateRange(
         validate(startDate, dueDate);
     }
 
-    public static DateRange of(GoalType type, LocalDate baseDate) {
+    public static DateRange of(LocalDate startDate, LocalDate dueDate) {
+        return new DateRange(startDate, dueDate);
+    }
+
+    public static DateRange ofType(GoalType type, LocalDate baseDate) {
         return new DateRange(
                 determineStartDate(type, baseDate),
                 determineDueDate(type, baseDate)

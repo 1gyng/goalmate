@@ -1,6 +1,6 @@
 package com.gm.goalmate.service;
 
-import com.gm.goalmate.domain.common.DateRange;
+import com.gm.goalmate.domain.goal.DateRange;
 import com.gm.goalmate.domain.goal.*;
 import com.gm.goalmate.domain.user.User;
 import com.gm.goalmate.domain.user.UserRepository;
@@ -87,7 +87,7 @@ public class GoalService {
 
     public GoalResponse.Summary getTodayGoalSummary(Long userId, GoalType type) {
         LocalDate today = LocalDate.now();
-        DateRange period = DateRange.of(type, today);
+        DateRange period = DateRange.ofType(type, today);
         List<GoalResponse.Item> items = getGoalItemsByPeriod(userId, type, period.startDate(), period.dueDate());
 
         return GoalResponse.Summary.builder()
@@ -99,7 +99,7 @@ public class GoalService {
     }
 
     private List<GoalResponse.Item> getGoalItemsByDate(Long userId, GoalType type, LocalDate date) {
-        DateRange period = DateRange.of(type, date);
+        DateRange period = DateRange.ofType(type, date);
 
         return getGoalItemsByPeriod(userId, type, period.startDate(), period.dueDate());
     }

@@ -1,6 +1,6 @@
 package com.gm.goalmate.service;
 
-import com.gm.goalmate.domain.common.DateRange;
+import com.gm.goalmate.domain.goal.DateRange;
 import com.gm.goalmate.domain.dailyRecord.DailyRecordRepository;
 import com.gm.goalmate.domain.dailyRecord.Emotion;
 import com.gm.goalmate.domain.dailyRecord.EmotionCount;
@@ -26,7 +26,7 @@ public class StatService {
 
     public List<StatResponse.EmotionStat> getMonthlyEmotionStat(Long userId) {
         LocalDate lastMonth = LocalDate.now().minusMonths(1);
-        DateRange period = DateRange.of(GoalType.MONTHLY, lastMonth);
+        DateRange period = DateRange.ofType(GoalType.MONTHLY, lastMonth);
         int totalDays = lastMonth.lengthOfMonth();
 
         List<EmotionCount> counts = dailyRecordRepository.countEmotion(userId, period.startDate(), period.dueDate());
@@ -41,7 +41,7 @@ public class StatService {
     }
 
     public List<StatResponse.SuccessRateStat> getMonthlySuccessRateStat(Long userId) {
-        DateRange period = DateRange.of(GoalType.MONTHLY, LocalDate.now());
+        DateRange period = DateRange.ofType(GoalType.MONTHLY, LocalDate.now());
         List<TypeSuccessRate> rates = goalRepository.findSuccessRateGroupByType(userId, period.startDate(), period.dueDate());
 
         Map<GoalType, StatResponse.SuccessRateStat> statMap = createSuccessRateStatMap(rates);

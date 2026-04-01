@@ -1,6 +1,5 @@
 package com.gm.goalmate.domain.goal;
 
-import com.gm.goalmate.domain.common.DateRange;
 import com.gm.goalmate.domain.user.User;
 import com.gm.goalmate.dto.GoalRequest;
 import jakarta.persistence.*;
@@ -40,14 +39,14 @@ public class Goal {
     public Goal(String task, GoalType type, LocalDate startDate, LocalDate dueDate, User user) {
         this.task = task;
         this.type = type;
-        this.dateRange = new DateRange(startDate, dueDate);
+        this.dateRange = DateRange.of(startDate, dueDate);
         this.user = user;
     }
 
     public void update(GoalRequest.Update request) {
         this.type = request.getType();
         this.task = request.getTask();
-        this.dateRange = new DateRange(request.getStartDate(), request.getDueDate());
+        this.dateRange = DateRange.of(request.getStartDate(), request.getDueDate());
     }
 
     public void updateResult(GoalRequest.UpdateResult request, LocalDate date) {
