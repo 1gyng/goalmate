@@ -2,7 +2,7 @@
     display: none;
 }
 
-#emotion-container input[type="radio"]:checked + .emotion-label {
+#emotion-container input[type="radio"]:checked+.emotion-label {
     background-color: white;
     border: 3px solid #657899;
     border-radius: 1rem;
@@ -15,4 +15,8 @@
 
 .emotion-tooltip:after {
     background-color: #657899 !important;
+}
+
+.text-primary {
+    color: #6e8c7e !important;
 }

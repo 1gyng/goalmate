@@ -1,6 +1,6 @@
-import {sendRequest} from './apiUtil.js';
-import {clearModalInput} from './modal.js';
-import {toast} from '/js/uiManager.js';
+import { sendRequest } from './apiUtil.js';
+import { clearModalInput } from './modal.js';
+import { toast } from '/js/uiManager.js';
 
 const elements = {
     modal: {
@@ -95,7 +95,7 @@ const login = async () => {
         elements.modal.login.close();
         toast.success(apiMessage.login(apiResponse.nickname), "bottom");
         setTimeout(() => {
-            location.replace('/goals/calendar');
+            location.replace('/dashboard');
         }, 1500);
     } catch (error) {
         elements.errorDiv.login.innerText = error.message;
