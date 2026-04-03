@@ -28,6 +28,7 @@ public class DashboardController {
         model.addAttribute("dailyGoals", goalService.getTodayGoalItemList(user.getUserId(), GoalType.DAILY));
         model.addAttribute("emotionStat", statService.getMonthlyEmotionStat(user.getUserId()));
         model.addAttribute("successRateStat", statService.getMonthlySuccessRateStat(user.getUserId()));
+        model.addAttribute("streak", statService.getCurrentStreak(user.getUserId()));
         return "dashboard";
     }
 }

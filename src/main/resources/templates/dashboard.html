@@ -27,8 +27,8 @@
                                 <span class="badge badge-outline justify-center"
                                     th:text="|${#lists.size(dailyGoals)} / 3|"></span>
                             </div>
-                            <div>
-                                
+                            <div class="streak bg-base-200">
+                                🔥 연속 [[${streak.currentStreak}]]일째 목표 달성 중 🔥
                             </div>
                             <div>
                                 <ul class="menu w-full bg-base-200 rounded-box gap-1">
@@ -36,7 +36,7 @@
                                     <li th:unless="${#lists.isEmpty(dailyGoals)}" th:each="goal : ${dailyGoals}">
                                         <label class="goal-item-btn justify-start font-normal" th:data-id="${goal.id}"
                                             th:data-result="${goal.result}">
-                                            <input type="checkbox" class="checkbox"
+                                            <input type="checkbox" class="checkbox checkbox-sm"
                                                 th:checked="${goal.result.name() == 'SUCCESS'}">
                                             <span th:text="${goal.task}">목표 제목</span>
                                         </label>
@@ -53,7 +53,7 @@
                                     <div class="flex flex-col text-center m-2 p-2 bg-base-200 rounded-box">
                                         <div class="mb-1" th:text="${s.type.name()}"></div>
                                         <div class="radial-progress text-primary"
-                                            th:style="|--value:${s.successRate}; --size:8rem;|"
+                                            th:style="|--value:${s.successRate}; --size:8rem; --thickness: 0.5rem;|"
                                             th:aria-valuenow="${s.successRate}" role="progressbar"
                                             th:utext="|${s.successRate}%<br>${s.successCount} / ${s.totalCount}|">
                                         </div>

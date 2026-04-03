@@ -1,13 +1,9 @@
 package com.gm.goalmate.service;
 
-import com.gm.goalmate.domain.goal.DateRange;
+import com.gm.goalmate.domain.goal.*;
 import com.gm.goalmate.domain.dailyRecord.DailyRecordRepository;
 import com.gm.goalmate.domain.dailyRecord.Emotion;
 import com.gm.goalmate.domain.dailyRecord.EmotionCount;
-import com.gm.goalmate.domain.goal.EmotionSuccessRate;
-import com.gm.goalmate.domain.goal.GoalRepository;
-import com.gm.goalmate.domain.goal.GoalType;
-import com.gm.goalmate.domain.goal.TypeSuccessRate;
 import com.gm.goalmate.dto.StatResponse;
 import org.springframework.stereotype.Service;
 
@@ -48,6 +44,44 @@ public class StatService {
         return new ArrayList<>(statMap.values());
     }
 
+    public StatResponse.CurrentStreak getCurrentStreak(Long userId) {
+        List<SuccessDate> successDates = goalRepository.findSuccessDate(userId);
+        LocalDate today = LocalDate.now();
+
+        if(isStreakInvalid(successDates, today)) {
+            return StatResponse.CurrentStreak.init();
+        }
+
+        int streak = calculateSuccessStreak(successDates);
+        return StatResponse.CurrentStreak.of(streak);
+    }
+
+    private boolean isStreakInvalid(List<SuccessDate> successDates, LocalDate baseDate) {
+        if(successDates.isEmpty()) {
+            return true;
+        }
+
+        LocalDate yesterday = baseDate.minusDays(1);
+        LocalDate latestDate = successDates.getFirst().getSuccessDate();
+
+        return !latestDate.equals(baseDate) && !latestDate.equals(yesterday);
+    }
+
+    private int calculateSuccessStreak(List<SuccessDate> successDates) {
+        LocalDate targetDate = successDates.getFirst().getSuccessDate();
+        int streak = 0;
+
+        for (SuccessDate successDate : successDates) {
+            if (successDate.getSuccessDate().equals(targetDate)) {
+                streak++;
+                targetDate = targetDate.minusDays(1);
+            } else {
+                break;
+            }
+        }
+        return streak;
+    }
+
     private Map<GoalType, StatResponse.SuccessRateStat> createSuccessRateStatMap(List<TypeSuccessRate> rates) {
         Map<GoalType, StatResponse.SuccessRateStat> statMap = new EnumMap<>(GoalType.class);
         for (GoalType type : GoalType.values()) {
@@ -56,7 +90,7 @@ public class StatService {
 
         rates.forEach(r -> {
             if(r.getType() != null) {
-                statMap.put(r.getType(), new StatResponse.SuccessRateStat(r.getType(), r.getSuccessRate(), r.getSuccessCount(), r.getTotalCount()));
+                statMap.put(r.getType(), StatResponse.SuccessRateStat.from(r));
             }
         });
 
@@ -73,7 +107,7 @@ public class StatService {
         counts.forEach(c -> {
             Emotion emotion = Emotion.valueOf(c.getName());
             statMap.computeIfPresent(emotion, (key, existing) ->
-                    new StatResponse.EmotionStat(key.name(), existing.getDescription(), c.getRecordedCount(), existing.getSuccessRate()));
+                    new StatResponse.EmotionStat(key.name(), existing.description(), c.getRecordedCount(), existing.successRate()));
         });
 
         rates.forEach(r -> {
@@ -83,7 +117,7 @@ public class StatService {
 
             Emotion emotion = Emotion.valueOf(r.getName());
             statMap.computeIfPresent(emotion, (key, existing) ->
-                    new StatResponse.EmotionStat(key.name(), existing.getDescription(), existing.getRecordedCount(), r.getSuccessRate()));
+                    new StatResponse.EmotionStat(key.name(), existing.description(), existing.recordedCount(), r.getSuccessRate()));
         });
 
         return statMap;

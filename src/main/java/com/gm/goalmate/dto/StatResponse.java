@@ -3,24 +3,15 @@ package com.gm.goalmate.dto;
 import com.gm.goalmate.domain.dailyRecord.Emotion;
 import com.gm.goalmate.domain.goal.GoalType;
 import com.gm.goalmate.domain.goal.TypeSuccessRate;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
 
 public class StatResponse {
 
     public static final String UNRECORDED_KEY = "UNRECORDED";
     public static final String UNRECORDED_DESCRIPTION = "기록 없음";
 
-    @Getter
     @Builder
-    @AllArgsConstructor
-    public static class EmotionStat {
-        String name;
-        String description;
-        Long recordedCount;
-        Double successRate;
-
+    public record EmotionStat(String name, String description, Long recordedCount, Double successRate) {
         public static EmotionStat init(Emotion emotion) {
             return EmotionStat.builder()
                     .name(emotion.name())
@@ -31,15 +22,8 @@ public class StatResponse {
         }
     }
 
-    @Getter
     @Builder
-    @AllArgsConstructor
-    public static class SuccessRateStat {
-        GoalType type;
-        Double successRate;
-        Long successCount;
-        Long totalCount;
-
+    public record SuccessRateStat(GoalType type, Double successRate, Long successCount, Long totalCount) {
         public static SuccessRateStat init(GoalType type) {
             return SuccessRateStat.builder()
                     .type(type)
@@ -56,6 +40,16 @@ public class StatResponse {
                     .successCount(rate.getSuccessCount())
                     .totalCount(rate.getTotalCount())
                     .build();
+        }
+    }
+
+    public record CurrentStreak(int currentStreak) {
+        public static CurrentStreak init() {
+            return new CurrentStreak(0);
+        }
+
+        public static CurrentStreak of(int streak) {
+            return new CurrentStreak(streak);
         }
     }
 }
