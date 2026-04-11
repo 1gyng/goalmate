@@ -1,6 +1,7 @@
 package com.gm.goalmate.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.gm.goalmate.domain.goal.DateRange;
 import com.gm.goalmate.domain.goal.Goal;
 import com.gm.goalmate.domain.goal.GoalResult;
 import com.gm.goalmate.domain.goal.GoalType;
@@ -68,4 +69,22 @@ public class GoalResponse {
         private GoalResult result;
     }
 
+    @Getter
+    @Builder
+    @AllArgsConstructor
+    public static class Detail {
+        private Long id;
+        private String task;
+        private GoalResult result;
+        private DateRange period;
+
+        public static Detail from(Goal goal) {
+            return Detail.builder()
+                    .id(goal.getGoalId())
+                    .task(goal.getTask())
+                    .result(goal.getResult())
+                    .period(goal.getDateRange())
+                    .build();
+        }
+    }
 }

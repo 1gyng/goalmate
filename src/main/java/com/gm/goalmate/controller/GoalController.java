@@ -1,13 +1,17 @@
 package com.gm.goalmate.controller;
 
 import com.gm.goalmate.config.LoginUser;
+import com.gm.goalmate.domain.goal.GoalResult;
 import com.gm.goalmate.domain.goal.GoalType;
 import com.gm.goalmate.domain.user.User;
 import com.gm.goalmate.dto.GoalRequest;
 import com.gm.goalmate.dto.GoalResponse;
 import com.gm.goalmate.service.GoalService;
 import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -57,24 +61,33 @@ public class GoalController {
         return ResponseEntity.created(location).build();
     }
 
+    @GetMapping(params = "type")
+    public ResponseEntity<Slice<GoalResponse.Detail>> getListGoalsByType(@LoginUser User user,
+                                                                        @PageableDefault(size = 15, sort = "dateRange.dueDate", direction = Sort.Direction.ASC) Pageable pageable,
+                                                                        @RequestParam("type") GoalType type,
+                                                                        @RequestParam(value = "result",required = false) GoalResult result) {
+        Slice<GoalResponse.Detail> goals = goalService.getGoalsByType(user.getUserId(), type, result, pageable);
+        return ResponseEntity.ok(goals);
+    }
+
 /*    @GetMapping(/{goalNum})
     public ResponseEntity<?> getGoal(@PathVariable Long goalNum, @LoginUser User user) {
         return ResponseEntity.ok().build();
     }*/
 
-    @DeleteMapping("/{goalNum}")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGoal(@PathVariable Long goalNum, @LoginUser User user) {
         goalService.deleteGoal(goalNum, user.getUserId());
         return ResponseEntity.noContent().build();
     }
 
-    @PutMapping("/{goalNum}")
+    @PutMapping("/{id}")
     public ResponseEntity<Void> updateGoal(@PathVariable Long goalNum, @Valid @RequestBody GoalRequest.Update request, @LoginUser User user) {
         goalService.updateGoal(goalNum, request, user.getUserId());
         return ResponseEntity.noContent().build();
     }
 
-    @PatchMapping("/{goalNum}/result")
+    @PatchMapping("/{id}/result")
     public ResponseEntity<GoalResponse.Result> updateGoalResult(@PathVariable Long goalNum, @Valid @RequestBody GoalRequest.UpdateResult request, @LoginUser User user) {
         GoalResponse.Result result = goalService.updateGoalResult(goalNum, request, user.getUserId());
         return ResponseEntity.ok(result);

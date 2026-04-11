@@ -6,6 +6,8 @@ import com.gm.goalmate.domain.user.User;
 import com.gm.goalmate.domain.user.UserRepository;
 import com.gm.goalmate.dto.GoalRequest;
 import com.gm.goalmate.dto.GoalResponse;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -96,6 +98,11 @@ public class GoalService {
                 .startDate(period.startDate())
                 .dueDate(period.dueDate())
                 .build();
+    }
+
+    public Slice<GoalResponse.Detail> getGoalsByType(Long userId, GoalType type, GoalResult result, Pageable pageable) {
+        Slice<Goal> goals = goalRepository.findGoalsByType(userId, type, result, pageable);
+        return goals.map(GoalResponse.Detail::from);
     }
 
     private List<GoalResponse.Item> getGoalItemsByDate(Long userId, GoalType type, LocalDate date) {

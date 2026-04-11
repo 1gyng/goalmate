@@ -1,5 +1,7 @@
 package com.gm.goalmate.domain.goal;
 
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -24,4 +26,7 @@ public interface GoalRepository extends JpaRepository<Goal, Long> {
 
     @Query(value = "SELECT DISTINCT DATE(result_date) AS success_date FROM goal WHERE user_id = :userId AND result = 'SUCCESS' ORDER BY success_date DESC", nativeQuery = true)
     List<SuccessDate> findSuccessDate(Long userId);
+
+    @Query("SELECT g FROM Goal g WHERE g.user.userId = :userId AND g.type = :type AND (:result IS NULL OR g.result = :result)")
+    Slice<Goal> findGoalsByType(Long userId, GoalType type, GoalResult result, Pageable pageable);
 }
