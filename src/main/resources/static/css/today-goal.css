@@ -1,0 +1,22 @@
+.goal-content {
+    padding: 0 0.4rem 0.4rem 0.4rem;
+}
+
+#goal-more-btn {
+    background-color: #65789974 !important;
+    border-color: white;
+    color: white !important;
+}
+
+#goal-more-btn:hover {
+    background-color: #657899 !important;
+    border-color: white;
+    color: white !important;
+}
+
+input[name="goalResultFilter"].btn:checked {
+    background-color: #65789974 !important;
+    border: none !important;
+    color: white !important;
+    box-shadow: 0 2px 3px rgba(218, 218, 218, 0.5) !important;
+}

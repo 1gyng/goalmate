@@ -1,223 +1,374 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{fragments/head :: head-config('오늘의 목표 | goalmate', null)}">
+<head th:replace="~{fragments/head :: head-config('오늘의 목표 | goalmate', ~{ :: today-goal-head})}">
+    <th:block th:fragment="today-goal-head">
+        <link th:href="@{/css/today-goal.css}" href="../css/today-goal.css" rel="stylesheet">
+    </th:block>
 </head>
 
 <body>
-<div class="flex flex-col h-screen">
-    <header th:replace="~{fragments/nav :: topNav}"></header>
+    <div class="flex flex-col h-screen">
+        <header th:replace="~{fragments/nav :: topNav}"></header>
 
-    <div class="flex flex-1 overflow-hidden">
-        <aside th:replace="~{fragments/nav :: leftNav}"></aside>
+        <div class="flex flex-1 overflow-hidden">
+            <aside th:replace="~{fragments/nav :: leftNav}"></aside>
 
-        <div id="drawer-container" class="drawer drawer-end">
-            <input id="selfReflectionDrawer" type="checkbox" class="drawer-toggle"/>
+            <div id="drawer-container" class="drawer drawer-end">
+                <input id="goal-list-drawer" type="checkbox" class="drawer-toggle" />
 
-            <div class="drawer-content flex flex-col p-6 transition-all duration-300">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
-                    <div class="card bg-base-100 shadow-xl border border-base-200">
-                        <div class="card-body p-6">
-                            <div class="flex justify-between items-center">
-                                <h2 class="card-title text-primary text-lg">📅 Daily</h2>
-                                <span class="badge badge-ghost badge-sm" th:text="${dailyGoals.startDate}"></span>
-                            </div>
-                            <div>
-                                <ul class="menu w-full bg-base-200 rounded-box gap-1">
-                                    <li th:if="${#lists.isEmpty(dailyGoals.items)}">등록된 일간 목표가 없어요!</li>
-                                    <li th:unless="${#lists.isEmpty(dailyGoals.items)}"
-                                        th:each="goal : ${dailyGoals.items}">
-                                        <button type="button" class="goal-item-btn justify-start font-normal"
+                <div class="drawer-content flex flex-col p-6 transition-all duration-300">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 p-6">
+                        <div class="card bg-base-100 shadow-xl border border-base-200">
+                            <div class="card-body p-6">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <h2 class="card-title text-lg min-w-[100px]">📅 Daily</h2>
+                                        <button class="btn btn-link no-underline p-0 text-gray-500 goal-list-btn"
+                                            data-type="DAILY">전체보기</button>
+                                    </div>
+                                    <span class="badge badge-ghost badge-sm" th:text="${dailyGoals.startDate}"></span>
+                                </div>
+                                <div>
+                                    <ul class="menu w-full bg-base-200 rounded-box gap-1">
+                                        <li th:if="${#lists.isEmpty(dailyGoals.items)}">등록된 일간 목표가 없어요!</li>
+                                        <li th:unless="${#lists.isEmpty(dailyGoals.items)}"
+                                            th:each="goal : ${dailyGoals.items}">
+                                            <button type="button" class="goal-item-btn justify-start font-normal"
                                                 th:data-id="${goal.id}" th:data-task="${goal.task}"
                                                 th:data-result="${goal.result}">
-                                            <span th:text="${goal.task}">목표 제목</span>
-                                        </button>
-                                    </li>
-                                </ul>
+                                                <span th:text="${goal.task}">목표 제목</span>
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="card bg-base-100 shadow-xl border border-base-200">
-                        <div class="card-body p-6">
-                            <div class="flex justify-between items-center">
-                                <h2 class="card-title text-accent text-lg">🗓️ Weekly</h2>
-                                <span class="badge badge-ghost badge-sm"
-                                      th:text="|${weeklyGoals.startDate} ~ ${weeklyGoals.dueDate}|"></span>
-                            </div>
+                        <div class="card bg-base-100 shadow-xl border border-base-200">
+                            <div class="card-body p-6">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <h2 class="card-title text-accent text-lg min-w-[100px]">🗓️ Weekly</h2>
+                                        <button class="btn btn-link no-underline p-0 text-gray-500 goal-list-btn"
+                                            data-type="WEEKLY">전체보기</button>
+                                    </div>
+                                    <span class="badge badge-ghost badge-sm"
+                                        th:text="|${weeklyGoals.startDate} ~ ${weeklyGoals.dueDate}|"></span>
+                                </div>
 
-                            <div>
-                                <ul class="menu w-full bg-base-200 rounded-box gap-1">
-                                    <li th:if="${#lists.isEmpty(weeklyGoals.items)}">등록된 주간 목표가 없어요!</li>
-                                    <li th:unless="${#lists.isEmpty(weeklyGoals.items)}"
-                                        th:each="goal : ${weeklyGoals.items}">
-                                        <button type="button" class="goal-item-btn justify-start font-normal"
+                                <div>
+                                    <ul class="menu w-full bg-base-200 rounded-box gap-1">
+                                        <li th:if="${#lists.isEmpty(weeklyGoals.items)}">등록된 주간 목표가 없어요!</li>
+                                        <li th:unless="${#lists.isEmpty(weeklyGoals.items)}"
+                                            th:each="goal : ${weeklyGoals.items}">
+                                            <button type="button" class="goal-item-btn justify-start font-normal"
                                                 th:data-id="${goal.id}" th:data-task="${goal.task}"
                                                 th:data-result="${goal.result}">
-                                            <span th:text="${goal.task}">목표 제목</span>
-                                        </button>
-                                    </li>
-                                </ul>
+                                                <span th:text="${goal.task}">목표 제목</span>
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="card bg-base-100 shadow-xl border border-base-200">
-                        <div class="card-body p-6">
-                            <div class="flex justify-between items-center">
-                                <h2 class="card-title text-accent text-lg">🚀 Monthly</h2>
-                                <span class="badge badge-ghost badge-sm"
-                                      th:text="|${monthlyGoals.startDate} ~ ${monthlyGoals.dueDate}|"></span>
-                            </div>
+                        <div class="card bg-base-100 shadow-xl border border-base-200">
+                            <div class="card-body p-6">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <h2 class="card-title text-accent text-lg min-w-[100px]">🚀 Monthly</h2>
+                                        <button class="btn btn-link no-underline p-0 text-gray-500 goal-list-btn"
+                                            data-type="MONTHLY">전체보기</button>
+                                    </div>
+                                    <span class="badge badge-ghost badge-sm"
+                                        th:text="|${monthlyGoals.startDate} ~ ${monthlyGoals.dueDate}|"></span>
+                                </div>
 
-                            <div>
-                                <ul class="menu w-full bg-base-200 rounded-box gap-1">
-                                    <li th:if="${#lists.isEmpty(monthlyGoals.items)}">등록된 월간 목표가 없어요!</li>
-                                    <li th:unless="${#lists.isEmpty(monthlyGoals.items)}"
-                                        th:each="goal : ${monthlyGoals.items}">
-                                        <button type="button" class="goal-item-btn justify-start font-normal"
+                                <div>
+                                    <ul class="menu w-full bg-base-200 rounded-box gap-1">
+                                        <li th:if="${#lists.isEmpty(monthlyGoals.items)}">등록된 월간 목표가 없어요!</li>
+                                        <li th:unless="${#lists.isEmpty(monthlyGoals.items)}"
+                                            th:each="goal : ${monthlyGoals.items}">
+                                            <button type="button" class="goal-item-btn justify-start font-normal"
                                                 th:data-id="${goal.id}" th:data-task="${goal.task}"
                                                 th:data-result="${goal.result}">
-                                            <span th:text="${goal.task}">목표 제목</span>
-                                        </button>
-                                    </li>
-                                </ul>
+                                                <span th:text="${goal.task}">목표 제목</span>
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="card bg-base-100 shadow-xl border border-base-200">
-                        <div class="card-body p-6">
-                            <div class="flex justify-between items-center">
-                                <h2 class="card-title text-accent text-lg">🏆 Yearly</h2>
-                                <span class="badge badge-ghost badge-sm"
-                                      th:text="|${yearlyGoals.startDate} ~ ${yearlyGoals.dueDate}|"></span>
-                            </div>
+                        <div class="card bg-base-100 shadow-xl border border-base-200">
+                            <div class="card-body p-6">
+                                <div class="flex justify-between items-center">
+                                    <div class="flex items-center">
+                                        <h2 class="card-title text-accent text-lg min-w-[100px]">🏆 Yearly</h2>
+                                        <button class="btn btn-link no-underline p-0 text-gray-500 goal-list-btn"
+                                            data-type="YEARLY">전체보기</button>
+                                    </div>
+                                    <span class="badge badge-ghost badge-sm"
+                                        th:text="|${yearlyGoals.startDate} ~ ${yearlyGoals.dueDate}|"></span>
+                                </div>
 
-                            <div>
-                                <ul class="menu w-full bg-base-200 rounded-box gap-1">
-                                    <li th:if="${#lists.isEmpty(yearlyGoals.items)}">등록된 연간 목표가 없어요!</li>
-                                    <li th:unless="${#lists.isEmpty(yearlyGoals.items)}"
-                                        th:each="goal : ${yearlyGoals.items}">
-                                        <button type="button" class="goal-item-btn justify-start font-normal"
+                                <div>
+                                    <ul class="menu w-full bg-base-200 rounded-box gap-1">
+                                        <li th:if="${#lists.isEmpty(yearlyGoals.items)}">등록된 연간 목표가 없어요!</li>
+                                        <li th:unless="${#lists.isEmpty(yearlyGoals.items)}"
+                                            th:each="goal : ${yearlyGoals.items}">
+                                            <button type="button" class="goal-item-btn justify-start font-normal"
                                                 th:data-id="${goal.id}" th:data-task="${goal.task}"
                                                 th:data-result="${goal.result}">
-                                            <span th:text="${goal.task}">목표 제목</span>
-                                        </button>
-                                    </li>
-                                </ul>
+                                                <span th:text="${goal.task}">목표 제목</span>
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="drawer-side border-l border-base-300">
-                <label for="selfReflectionDrawer" class="drawer-overlay"></label>
-                <aside class="p-4 w-96 min-h-full flex flex-col gap-y-4">
-                    <div class="flex justify-start">
-                        <button id="toggle-drawer-btn" class="btn btn-circle btn-ghost">
-                            <i data-lucide="chevrons-right" class="w-8 h-8"></i>
-                        </button>
-                    </div>
+                <div class="drawer-side border-l border-base-300">
+                    <label for="goal-list-drawer" class="drawer-overlay"></label>
+                    <aside class="p-4 w-98 h-screen flex flex-col gap-y-4">
+                        <div class="flex justify-start shrink-0">
+                            <label for="goal-list-drawer" class="btn btn-circle btn-ghost">
+                                <i data-lucide="chevrons-right" class="w-8 h-8"></i>
+                            </label>
+                        </div>
 
-                    <div class="card bg-base-100 shadow-sm border border-base-200">
-                        <div class="card-body">
-                            <h2 class="card-title text-md font-bold">
-                                <span class="text-2xl" id="drawer-goal-task"></span>
-                            </h2>
-                            <label class="input">
-                                <span class="label">목표 완료일</span>
-                                <input type="date" />
-                              </label>
-                            <div class="join w-full" id="result-radio-div">
-                                <input type="radio" class="btn join-item flex-1" name="result" aria-label="달성"
-                                       value="SUCCESS"/>
-                                <input type="radio" class="btn join-item flex-1" name="result" aria-label="미달성"
-                                       value="FAILED"/>
+                        <div class="card bg-base-100 shadow-sm border border-base-200">
+                            <div class="card-body">
+                                <div id="goal-filter-container" class="flex justify-end gap-x-1">
+                                    <input type="radio" name="goalResultFilter"
+                                        class="btn btn-sm btn-ghost rounded-full" aria-label="전체" value="ALL" checked />
+                                    <input type="radio" name="goalResultFilter"
+                                        class="btn btn-sm btn-ghost rounded-full" aria-label="달성" value="SUCCESS" />
+                                    <input type="radio" name="goalResultFilter"
+                                        class="btn btn-sm btn-ghost rounded-full" aria-label="미달성" value="FAILED" />
+                                    <input type="radio" name="goalResultFilter"
+                                        class="btn btn-sm btn-ghost rounded-full" aria-label="미선택" value="NONE" />
+                                </div>
+                                <div class="overflow-y-auto [scrollbar-gutter:stable] max-h-100">
+                                    <ul id="goal-list-container" class="list bg-base-100 rounded-box pr-2">
+
+                                    </ul>
+                                </div>
+                                <div id="more-btn-container" class="card-actions hidden shadow-sm">
+                                    <button id="goal-more-btn" class="btn w-full">더보기</button>
+                                </div>
                             </div>
                         </div>
-                    </div>
-
-                    <div class="p-4 border border-dashed border-base-300 rounded-box flex-1 overflow-y-auto">
-                        <h2 class="text-2xl font-black mb-8"> 6월 21일, 하루는 어땠나요?</h2>
-                        <p class="opacity-50">내용이 들어갈 자리</p>
-                    </div>
-                </aside>
+                    </aside>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<th:block th:replace="~{fragments/script :: common-script}"></th:block>
-<script type="module">
-    import {sendRequest} from '/js/apiUtil.js';
-    import {toast} from '/js/uiManager.js';
+    <template id="goal-item-template">
+        <li class="flex flex-col">
+            <div class="goal-period w-full divider">
+                <span class="goal-startDate"></span>
+                <span class="goal-dueDate"></span>
+            </div>
+            <div class="goal-content">
+                <span class="goal-result badge badge-soft w-15"></span>
+                <span class="goal-task"></span>
+            </div>
+        </li>
+    </template>
 
-    const GOAL_RESULT_MESSAGES = {
-        SUCCESS: "목표 달성! 다음 목표도 파이팅 해봐요✨",
-        FAILED: "저장 완료. 이번의 아쉬움은 다음에 채워봐요💪"
-    };
+    <th:block th:replace="~{fragments/script :: common-script}"></th:block>
+    <script type="module">
+        import { sendRequest } from '/js/apiUtil.js';
+        import { toast } from '/js/uiManager.js';
 
+        const GOAL_RESULT_MESSAGES = {
+            SUCCESS: "목표 달성! 다음 목표도 파이팅 해봐요✨",
+            FAILED: "저장 완료. 이번의 아쉬움은 다음에 채워봐요💪"
+        };
 
-    let currentGoalId = null;
-    let currentGoalResult = null;
+        const GOAL_RESULT_CONFIG = {
+            SUCCESS: {
+                label: '달성',
+                badge: 'badge-success'
+            },
+            FAILED: {
+                label: '미달성',
+                badge: 'badge-error'
+            },
+            NONE: {
+                label: '미선택',
+                badge: 'badge-warning'
+            }
+        };
 
-    function toggleDrawer() {
-        const container = document.getElementById('drawer-container');
-        container.classList.toggle('drawer-open');
-    }
+        let currentGoalId = null;
+        let currentGoalResult = '';
+        let currentFilter = '';
+        let currentGoalListPage = 0;
+        let currentType = '';
 
-    document.getElementById('toggle-drawer-btn').addEventListener('click', toggleDrawer);
+        function openDrawer() {
+            const container = document.getElementById('drawer-container');
+            const checkbox = document.getElementById('goal-list-drawer');
 
-    function showSelfReflectionDrawer(e) {
-        currentGoalId = e.dataset.id;
-        currentGoalResult = e.dataset.result;
-
-        const goalTask = e.dataset.task;
-
-        document.getElementById('drawer-goal-task').innerText = `🎯 ${goalTask}`;
-
-        const targetRadio = document.querySelector(`#result-radio-div input[value="${currentGoalResult}"]`);
-        if (targetRadio) {
-            targetRadio.checked = true;
+            checkbox.checked = true;
+            container.classList.add('drawer-open');
         }
 
-        toggleDrawer();
-    }
+        function closeDrawer() {
+            const container = document.getElementById('drawer-container');
+            const checkbox = document.getElementById('goal-list-drawer');
 
-    document.querySelectorAll('.goal-item-btn').forEach(button => {
-        button.addEventListener('click', (e) => {
-            const clickedBtn = e.currentTarget;
+            container.classList.remove('drawer-open');
+        }
 
-            showSelfReflectionDrawer(clickedBtn);
-        })
-    })
+        const buildUrl = (type, result = 'ALL', page = 0) => {
+            const params = new URLSearchParams();
+            params.append('type', type);
 
-    document.querySelectorAll('#result-radio-div input[type="radio"]').forEach(radio => {
-        radio.addEventListener('change', async (e) => {
-            const goalId = currentGoalId;
-            const savedResult = currentGoalResult;
-            const selectedResult = e.target.value;
+            if (result && result !== 'ALL') {
+                params.append('result', result);
+            }
 
-            if (savedResult === selectedResult) {
+            params.append('page', page);
+
+            return `/goals?${params.toString()}`;
+        };
+
+        const renderGoalList = async (type, url) => {
+            try {
+                const apiResponse = await sendRequest(url, 'GET');
+                const template = document.getElementById('goal-item-template');
+                const fragment = document.createDocumentFragment();
+                const container = document.getElementById('goal-list-container');
+
+                let startDate = '';
+                let dueDate = '';
+                const isDaily = (type === 'DAILY');
+                const isLastPage = apiResponse.last;
+
+                apiResponse.content.forEach(g => {
+                    const clone = template.content.cloneNode(true);
+
+                    if (startDate == g.period.startDate && dueDate == g.period.dueDate) {
+                        clone.querySelector('.goal-period').remove();
+                    } else {
+                        startDate = g.period.startDate;
+                        dueDate = g.period.dueDate;
+
+                        if (isDaily) {
+                            clone.querySelector('.goal-startDate').remove();
+                            clone.querySelector('.goal-dueDate').textContent = dueDate;
+
+                        } else {
+                            clone.querySelector('.goal-startDate').textContent = `${startDate} ~ ${dueDate}`;
+                        }
+                    }
+
+                    clone.querySelector('.goal-result').textContent = GOAL_RESULT_CONFIG[g.result].label;
+                    clone.querySelector('.goal-result').classList.add(GOAL_RESULT_CONFIG[g.result].badge);
+                    clone.querySelector('.goal-task').textContent = g.task;
+
+                    fragment.appendChild(clone);
+                });
+                container.appendChild(fragment);
+
+                if (isLastPage) {
+                    document.getElementById('more-btn-container').classList.add('hidden');
+                } else {
+                    document.getElementById('more-btn-container').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.log(error.message);
+            }
+        }
+
+        const resetGoalList = (isAppend) => {
+            if (isAppend) {
                 return;
             }
+            const container = document.getElementById('goal-list-container');
 
-            const updateResultData = {
-                result: selectedResult
-            };
+            container.innerHTML = '';
+            currentGoalListPage = 0;
+        };
 
-            try {
-                const apiResponse = await sendRequest(`/goals/${goalId}/result`, 'PATCH', updateResultData);
-                currentGoalResult = selectedResult;
-                toast.success(GOAL_RESULT_MESSAGES[apiResponse.result]);
-            } catch (error) {
-                toast.error(error.message);
+        const showGoalListDrawer = async (type, isAppend = false) => {
+            currentFilter = 'ALL';
+            resetGoalList(isAppend);
+
+            const allRadio = document.querySelector('input[name="goalResultFilter"][value="ALL"]');
+            allRadio.checked = true;
+
+            const url = buildUrl(type);
+            renderGoalList(type, url);
+            openDrawer();
+        };
+
+        function showNextGoalListPage() {
+            currentGoalListPage++;
+
+            const url = buildUrl(currentType, currentFilter, currentGoalListPage);
+            resetGoalList(true);
+            renderGoalList(currentType, url);
+        }
+
+        document.getElementById('goal-more-btn').addEventListener('click', showNextGoalListPage);
+
+
+
+        document.querySelectorAll('.goal-list-btn').forEach(button => {
+            button.addEventListener('click', (e) => {
+                currentType = e.currentTarget.dataset.type;
+                showGoalListDrawer(currentType);
+            });
+        });
+
+        document.getElementById('goal-list-drawer').addEventListener('change', (e) => {
+            if (!e.target.checked) {
+                closeDrawer();
             }
         });
-    });
-</script>
+
+        document.querySelectorAll('#goal-filter-container input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', async (e) => {
+                currentFilter = e.target.value;                
+                resetGoalList();
+
+                const url = buildUrl(currentType, currentFilter, currentGoalListPage);
+                renderGoalList(currentType, url);
+            });
+        });
+
+        document.querySelectorAll('#result-radio-div input[type="radio"]').forEach(radio => {
+            radio.addEventListener('change', async (e) => {
+                const goalId = currentGoalId;
+                const savedResult = currentGoalResult;
+                const selectedResult = e.target.value;
+
+                if (savedResult === selectedResult) {
+                    return;
+                }
+
+                const updateResultData = {
+                    result: selectedResult
+                };
+
+                try {
+                    const apiResponse = await sendRequest(`/goals/${goalId}/result`, 'PATCH', updateResultData);
+                    currentGoalResult = selectedResult;
+                    toast.success(GOAL_RESULT_MESSAGES[apiResponse.result]);
+                } catch (error) {
+                    toast.error(error.message);
+                }
+            });
+        });
+    </script>
 </body>
 
 </html>

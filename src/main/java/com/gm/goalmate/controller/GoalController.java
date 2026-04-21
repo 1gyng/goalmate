@@ -63,7 +63,7 @@ public class GoalController {
 
     @GetMapping(params = "type")
     public ResponseEntity<Slice<GoalResponse.Detail>> getListGoalsByType(@LoginUser User user,
-                                                                        @PageableDefault(size = 15, sort = "dateRange.dueDate", direction = Sort.Direction.ASC) Pageable pageable,
+                                                                        @PageableDefault(size = 5, sort = "dateRange.dueDate", direction = Sort.Direction.DESC) Pageable pageable,
                                                                         @RequestParam("type") GoalType type,
                                                                         @RequestParam(value = "result",required = false) GoalResult result) {
         Slice<GoalResponse.Detail> goals = goalService.getGoalsByType(user.getUserId(), type, result, pageable);
