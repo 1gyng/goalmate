@@ -76,6 +76,7 @@ public class GoalResponse {
         private Long id;
         private String task;
         private GoalResult result;
+        private LocalDate resultDate;
         private DateRange period;
 
         public static Detail from(Goal goal) {
@@ -83,6 +84,7 @@ public class GoalResponse {
                     .id(goal.getGoalId())
                     .task(goal.getTask())
                     .result(goal.getResult())
+                    .resultDate(goal.getResultDate())
                     .period(goal.getDateRange())
                     .build();
         }

@@ -133,7 +133,7 @@
 
                 <div class="drawer-side border-l border-base-300">
                     <label for="goal-list-drawer" class="drawer-overlay"></label>
-                    <aside class="p-4 w-98 h-screen flex flex-col gap-y-4">
+                    <aside class="p-4 w-[55vh] h-screen flex flex-col gap-y-2">
                         <div class="flex justify-start shrink-0">
                             <label for="goal-list-drawer" class="btn btn-circle btn-ghost">
                                 <i data-lucide="chevrons-right" class="w-8 h-8"></i>
@@ -141,7 +141,7 @@
                         </div>
 
                         <div class="card bg-base-100 shadow-sm border border-base-200">
-                            <div class="card-body">
+                            <div class="card-body h-[55vh] flex flex-col">
                                 <div id="goal-filter-container" class="flex justify-end gap-x-1">
                                     <input type="radio" name="goalResultFilter"
                                         class="btn btn-sm btn-ghost rounded-full" aria-label="전체" value="ALL" checked />
@@ -152,13 +152,32 @@
                                     <input type="radio" name="goalResultFilter"
                                         class="btn btn-sm btn-ghost rounded-full" aria-label="미선택" value="NONE" />
                                 </div>
-                                <div class="overflow-y-auto [scrollbar-gutter:stable] max-h-100">
-                                    <ul id="goal-list-container" class="list bg-base-100 rounded-box pr-2">
+                                <div class="overflow-y-auto [scrollbar-gutter:stable] flex-1">
+                                    <ul id="goal-list-container" class="list bg-base-100 rounded-box p-2">
 
                                     </ul>
                                 </div>
-                                <div id="more-btn-container" class="card-actions hidden shadow-sm">
+                                <div id="more-btn-container" class="card-actions hidden shadow-sm flex-none">
                                     <button id="goal-more-btn" class="btn w-full">더보기</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="drawer-result" class="card bg-base-100 shadow-sm border border-base-200 hidden">
+                            <div class="card-body gap-y-2">
+                                <h2 class="card-title">
+                                    <i data-lucide="goal"></i>
+                                    <span id="drawer-goal-task" class="text-sm font-bold"></span>
+                                </h2>
+                                <label class="input input-sm">
+                                    <span class="label">목표 완료일</span>
+                                    <input type="date" />
+                                </label>
+                                <div class="join w-full" id="result-radio-div">
+                                    <input type="radio" class="btn join-item flex-1" name="result" aria-label="달성"
+                                        value="SUCCESS" />
+                                    <input type="radio" class="btn join-item flex-1" name="result" aria-label="미달성"
+                                        value="FAILED" />
                                 </div>
                             </div>
                         </div>
@@ -170,13 +189,16 @@
 
     <template id="goal-item-template">
         <li class="flex flex-col">
-            <div class="goal-period w-full divider">
-                <span class="goal-startDate"></span>
-                <span class="goal-dueDate"></span>
+            <div class="goal-period w-full divider mb-3">
+                <span class="goal-date"></span>
             </div>
-            <div class="goal-content">
-                <span class="goal-result badge badge-soft w-15"></span>
-                <span class="goal-task"></span>
+            <div class="goal-content flex justify-between hover:bg-gray-50 active:bg-gray-100">
+                <button type="button" class="w-full p-1 text-left goal-item-btn">
+                    <span class="goal-result badge badge-soft w-15"></span>
+                    <span class="goal-task"></span>
+                </button>
+                <button class="goal-delete-btn"><i data-lucide="eraser"
+                        class="text-sm text-gray-400 hover:text-gray-900 pr-1"></i></button>
             </div>
         </li>
     </template>
@@ -185,6 +207,7 @@
     <script type="module">
         import { sendRequest } from '/js/apiUtil.js';
         import { toast } from '/js/uiManager.js';
+        import { goalApi, GOAL_API_MESSAGES } from '/js/goalApi.js';
 
         const GOAL_RESULT_MESSAGES = {
             SUCCESS: "목표 달성! 다음 목표도 파이팅 해봐요✨",
@@ -206,8 +229,6 @@
             }
         };
 
-        let currentGoalId = null;
-        let currentGoalResult = '';
         let currentFilter = '';
         let currentGoalListPage = 0;
         let currentType = '';
@@ -262,11 +283,10 @@
                         dueDate = g.period.dueDate;
 
                         if (isDaily) {
-                            clone.querySelector('.goal-startDate').remove();
-                            clone.querySelector('.goal-dueDate').textContent = dueDate;
+                            clone.querySelector('.goal-date').textContent = dueDate;
 
                         } else {
-                            clone.querySelector('.goal-startDate').textContent = `${startDate} ~ ${dueDate}`;
+                            clone.querySelector('.goal-date').textContent = `${startDate} ~ ${dueDate}`;
                         }
                     }
 
@@ -274,9 +294,15 @@
                     clone.querySelector('.goal-result').classList.add(GOAL_RESULT_CONFIG[g.result].badge);
                     clone.querySelector('.goal-task').textContent = g.task;
 
+                    clone.querySelector('.goal-content').dataset.id = g.id;
+                    clone.querySelector('.goal-content').dataset.task = g.task;
+                    clone.querySelector('.goal-content').dataset.result = g.result;
+                    clone.querySelector('.goal-content').dataset.resultDate = g.resultDate;
+
                     fragment.appendChild(clone);
                 });
                 container.appendChild(fragment);
+                lucide.createIcons();
 
                 if (isLastPage) {
                     document.getElementById('more-btn-container').classList.add('hidden');
@@ -296,6 +322,16 @@
 
             container.innerHTML = '';
             currentGoalListPage = 0;
+        };
+
+        const resetGoalResult = () => {
+            const radios = document.querySelectorAll('input[name="result"]');
+
+            radios.forEach(r => {
+                r.checked = false;
+            });
+
+            document.querySelector('input[type="date"]').value = '';
         };
 
         const showGoalListDrawer = async (type, isAppend = false) => {
@@ -320,8 +356,6 @@
 
         document.getElementById('goal-more-btn').addEventListener('click', showNextGoalListPage);
 
-
-
         document.querySelectorAll('.goal-list-btn').forEach(button => {
             button.addEventListener('click', (e) => {
                 currentType = e.currentTarget.dataset.type;
@@ -337,7 +371,7 @@
 
         document.querySelectorAll('#goal-filter-container input[type="radio"]').forEach(radio => {
             radio.addEventListener('change', async (e) => {
-                currentFilter = e.target.value;                
+                currentFilter = e.target.value;
                 resetGoalList();
 
                 const url = buildUrl(currentType, currentFilter, currentGoalListPage);
@@ -345,10 +379,68 @@
             });
         });
 
+        const handleDelete = async (id, row) => {
+            if (!confirm('해당 목표를 정말 삭제하시겠습니까?')) return;
+
+            const isSuccess = await goalApi.delete(id);
+
+            if (isSuccess) {
+                toast.success(GOAL_API_MESSAGES.DELETE);
+                row.remove();
+            } else {
+                toast.error(GOAL_API_MESSAGES.ERROR);
+            }
+        }
+
+        document.addEventListener('click', (e) => {
+            const drawer = document.getElementById('drawer-result');
+            const row = e.target.closest('.goal-content');
+
+            if (!row) return;
+
+            const deleteBtn = e.target.closest('.goal-delete-btn');
+            const goalId = row.dataset.id;
+
+            if (deleteBtn) {
+                handleDelete(goalId, row);
+            }
+
+            const btn = e.target.closest('.goal-item-btn');
+
+            document.querySelectorAll('.goal-content.bg-gray-100').forEach(btn => {
+                btn.classList.remove('bg-gray-100');
+            });
+
+            const task = row.dataset.task;
+            const result = row.dataset.result;
+            const resultDate = row.dataset.resultDate;
+            const resultRadio = document.querySelector(`input[name="result"][value="${result}"]`);
+
+            drawer.querySelector('span').textContent = task;
+            drawer.classList.remove('hidden');
+            row.classList.add('bg-gray-100');
+
+            drawer.dataset.id = goalId;
+            drawer.dataset.result = result;
+            drawer.dataset.resultDate = resultDate;
+
+            resetGoalResult();
+
+            const hasResult = (result !== 'NONE');
+            if (hasResult) {
+                resultRadio.checked = true;
+                document.querySelector('input[type="date"]').value = resultDate;
+            }
+        });
+
         document.querySelectorAll('#result-radio-div input[type="radio"]').forEach(radio => {
             radio.addEventListener('change', async (e) => {
-                const goalId = currentGoalId;
-                const savedResult = currentGoalResult;
+                const drawer = document.getElementById('drawer-result');
+                const goalId = drawer.dataset.id;
+
+                const savedResult = drawer.dataset.result;
+                const savedResultDate = drawer.dataset.resultDate;
+
                 const selectedResult = e.target.value;
 
                 if (savedResult === selectedResult) {
@@ -361,7 +453,6 @@
 
                 try {
                     const apiResponse = await sendRequest(`/goals/${goalId}/result`, 'PATCH', updateResultData);
-                    currentGoalResult = selectedResult;
                     toast.success(GOAL_RESULT_MESSAGES[apiResponse.result]);
                 } catch (error) {
                     toast.error(error.message);

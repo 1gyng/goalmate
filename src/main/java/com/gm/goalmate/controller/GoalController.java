@@ -57,7 +57,7 @@ public class GoalController {
     public ResponseEntity<Void> addGoal(@Valid @RequestBody GoalRequest.Add request, @LoginUser User user) {
         Long goalId = goalService.addGoal(request, user.getUserId());
 
-        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{goalNum}").buildAndExpand(goalId).toUri();
+        URI location = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(goalId).toUri();
         return ResponseEntity.created(location).build();
     }
 
@@ -76,20 +76,20 @@ public class GoalController {
     }*/
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteGoal(@PathVariable Long goalNum, @LoginUser User user) {
-        goalService.deleteGoal(goalNum, user.getUserId());
+    public ResponseEntity<Void> deleteGoal(@PathVariable Long id, @LoginUser User user) {
+        goalService.deleteGoal(id, user.getUserId());
         return ResponseEntity.noContent().build();
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Void> updateGoal(@PathVariable Long goalNum, @Valid @RequestBody GoalRequest.Update request, @LoginUser User user) {
-        goalService.updateGoal(goalNum, request, user.getUserId());
+    public ResponseEntity<Void> updateGoal(@PathVariable Long id, @Valid @RequestBody GoalRequest.Update request, @LoginUser User user) {
+        goalService.updateGoal(id, request, user.getUserId());
         return ResponseEntity.noContent().build();
     }
 
     @PatchMapping("/{id}/result")
-    public ResponseEntity<GoalResponse.Result> updateGoalResult(@PathVariable Long goalNum, @Valid @RequestBody GoalRequest.UpdateResult request, @LoginUser User user) {
-        GoalResponse.Result result = goalService.updateGoalResult(goalNum, request, user.getUserId());
+    public ResponseEntity<GoalResponse.Result> updateGoalResult(@PathVariable Long id, @Valid @RequestBody GoalRequest.UpdateResult request, @LoginUser User user) {
+        GoalResponse.Result result = goalService.updateGoalResult(id, request, user.getUserId());
         return ResponseEntity.ok(result);
     }
 
