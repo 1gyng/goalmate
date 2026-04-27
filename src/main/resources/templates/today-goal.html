@@ -165,10 +165,13 @@
 
                         <div id="drawer-result" class="card bg-base-100 shadow-sm border border-base-200 hidden">
                             <div class="card-body gap-y-2">
-                                <h2 class="card-title">
-                                    <i data-lucide="goal"></i>
-                                    <span id="drawer-goal-task" class="text-sm font-bold"></span>
-                                </h2>
+                                <div class="flex justify-between">
+                                    <h2 class="card-title">
+                                        <i data-lucide="goal"></i>
+                                        <span id="drawer-goal-task" class="text-sm font-bold"></span>
+                                    </h2>
+                                    <button id="result-update-btn" class="btn btn-sm rounded-full"></button>
+                                </div>
                                 <label class="input input-sm">
                                     <span class="label">목표 완료일</span>
                                     <input type="date" />
@@ -332,11 +335,13 @@
             });
 
             document.querySelector('input[type="date"]').value = '';
+            document.getElementById('drawer-goal-task').textContent = '';
         };
 
         const showGoalListDrawer = async (type, isAppend = false) => {
             currentFilter = 'ALL';
             resetGoalList(isAppend);
+            resetGoalResult();
 
             const allRadio = document.querySelector('input[name="goalResultFilter"][value="ALL"]');
             allRadio.checked = true;
@@ -415,8 +420,8 @@
             const result = row.dataset.result;
             const resultDate = row.dataset.resultDate;
             const resultRadio = document.querySelector(`input[name="result"][value="${result}"]`);
+            const resultBtn = document.getElementById('result-update-btn');
 
-            drawer.querySelector('span').textContent = task;
             drawer.classList.remove('hidden');
             row.classList.add('bg-gray-100');
 
@@ -430,34 +435,45 @@
             if (hasResult) {
                 resultRadio.checked = true;
                 document.querySelector('input[type="date"]').value = resultDate;
+
             }
+
+            drawer.querySelector('span').textContent = task;
+            resultBtn.textContent = hasResult ? '수정' : '추가';
         });
 
-        document.querySelectorAll('#result-radio-div input[type="radio"]').forEach(radio => {
-            radio.addEventListener('change', async (e) => {
-                const drawer = document.getElementById('drawer-result');
-                const goalId = drawer.dataset.id;
+        document.getElementById('result-update-btn').addEventListener('click', async (e) => {
+            const drawer = document.getElementById('drawer-result');
+            const goalId = drawer.dataset.id;
 
-                const savedResult = drawer.dataset.result;
-                const savedResultDate = drawer.dataset.resultDate;
+            const savedResult = drawer.dataset.result;
+            const savedResultDate = drawer.dataset.resultDate;
 
-                const selectedResult = e.target.value;
+            const selectedResult = drawer.querySelector('input[name="result"]:checked').value;
+            const selectedResultDate = drawer.querySelector('input[type="date"]').value;
 
-                if (savedResult === selectedResult) {
-                    return;
-                }
+            if (savedResult === selectedResult && savedResultDate === selectedResultDate) {
+                return;
+            }
 
-                const updateResultData = {
-                    result: selectedResult
-                };
+            const updateResultData = {
+                result: selectedResult,
+                resultDate: selectedResultDate
+            };
 
-                try {
-                    const apiResponse = await sendRequest(`/goals/${goalId}/result`, 'PATCH', updateResultData);
-                    toast.success(GOAL_RESULT_MESSAGES[apiResponse.result]);
-                } catch (error) {
-                    toast.error(error.message);
-                }
-            });
+            try {
+                const apiResponse = await sendRequest(`/goals/${goalId}/result`, 'PATCH', updateResultData);
+                toast.success(GOAL_RESULT_MESSAGES[apiResponse.result]);
+
+                const targetRow = document.querySelector(`.goal-content[data-id="${goalId}"]`);
+                targetRow.querySelector('.goal-result').classList.add(GOAL_RESULT_CONFIG[selectedResult].badge);
+                targetRow.querySelector('.goal-result').textContent = GOAL_RESULT_CONFIG[selectedResult].label;
+
+                targetRow.dataset.result = selectedResult;
+                targetRow.dataset.resultDate = selectedResultDate;
+            } catch (error) {
+                toast.error(error.message);
+            }
         });
     </script>
 </body>

@@ -1,6 +1,7 @@
-import {clearModalInput} from '/js/modal.js';
-import {sendRequest} from '/js/apiUtil.js';
-import {toast} from '/js/uiManager.js';
+import { clearModalInput } from '/js/modal.js';
+import { sendRequest } from '/js/apiUtil.js';
+import { toast } from '/js/uiManager.js';
+import { goalApi, GOAL_API_MESSAGES } from '/js/goalApi.js';
 
 let selectedDate = '';
 let calendar;
@@ -211,16 +212,17 @@ const determinePriority = (type) => {
     }
 }
 
-const deleteGoal = async (id) => {
-    if (!confirm("정말 삭제하시겠습니까?")) return;
+const handleDelete = async (id) => {
+    if (!confirm('해당 목표를 정말 삭제하시겠습니까?')) return;
 
-    try {
-        await sendRequest(`/goals/${id}`, 'DELETE');
+    const isSuccess = await goalApi.delete(id);
+
+    if (isSuccess) {
         calendar.refetchEvents();
         elements.modal.saveGoal.close();
-        toast.success(apiMessage.delete);
-    } catch (error) {
-        toast.error(error.message);
+        toast.success(GOAL_API_MESSAGES.DELETE);
+    } else {
+        toast.error(GOAL_API_MESSAGES.ERROR);
     }
 }
 
@@ -247,7 +249,7 @@ elements.button.delete.addEventListener('click', async () => {
     const goalId = elements.modal.saveGoal.dataset.id;
 
     if (goalId) {
-        await deleteGoal(goalId);
+        await handleDelete(goalId);
     }
 });
 elements.button.openAddGoal.addEventListener('click', openAddGoal);
