@@ -52,6 +52,13 @@ public class UserController {
                         .build());
     }
 
+    @PostMapping("/logout")
+    public String logout(HttpSession session) {
+        session.invalidate();
+
+        return "redirect:/";
+    }
+
     @GetMapping("/join/check-id/{loginId}")
     public ResponseEntity<UserResponse.LoginIdCheck> checkLoginId(@PathVariable String loginId) {
         UserResponse.LoginIdCheck loginIdCheck = userService.checkLoginId(loginId);

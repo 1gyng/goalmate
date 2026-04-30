@@ -2,43 +2,43 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <body>
-<header th:fragment="topNav" class="h-16 goal-nav p-3">
-    <div class="flex items-center">
-        <a href="/">
-            <img th:src="@{/img/symbol.png}" alt="symbol" class="h-12 w-12">
-        </a>
-        <a href="/">
-            <img th:src="@{/img/logo.png}" alt="logo" class="h-5">
-        </a>
-    </div>
-    <nav class="flex">
-        <ul>
-            <li></li>
-        </ul>
-    </nav>
-</header>
+    <header th:fragment="topNav" class="h-16 goal-nav p-3 flex justify-between items-center">
+        <div class="flex items-center">
+            <a href="/">
+                <img th:src="@{/img/symbol.png}" alt="symbol" class="h-12 w-12">
+            </a>
+            <a href="/">
+                <img th:src="@{/img/logo.png}" alt="logo" class="h-5">
+            </a>
+        </div>
+        <form th:if="${session.loginUser != null}" th:action="@{/logout}" method="post">
+            <button type="submit" class="flex mr-6 gap-2 btn btn-ghost"><i data-lucide="log-out"
+                    class="h-4 w-4"></i>로그아웃</button>
+        </form>
+    </header>
 
-<aside th:fragment="leftNav" class="w-16 goal-nav min-h-full flex flex-col items-center">
-    <nav>
-        <ul class="menu rounded-box gap-y-5">
-            <li>
-                <a th:href="@{/dashboard}" class="tooltip tooltip-right nav-tooltip" data-tip="대시보드">
-                    <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
-                </a>
-            </li>
-            <li>
-                <a th:href="@{/goals/today}" class="tooltip tooltip-right nav-tooltip" data-tip="오늘의 목표">
-                    <i data-lucide="list-todo" class="w-6 h-6"></i>
-                </a>
-            </li>
-            <li>
-                <a th:href="@{/goals/calendar}" class="tooltip tooltip-right nav-tooltip" data-tip="캘린더">
-                    <i data-lucide="calendar-days" class="w-6 h-6"></i>
-                </a>
-            </li>
-        </ul>
-    </nav>
-</aside>
+    <aside th:fragment="leftNav" class="w-16 goal-nav min-h-full flex flex-col items-center">
+        <nav>
+            <ul class="menu rounded-box gap-y-5">
+                <li>
+                    <a th:href="@{/dashboard}" class="tooltip tooltip-right nav-tooltip" data-tip="대시보드">
+                        <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/goals/today}" class="tooltip tooltip-right nav-tooltip" data-tip="오늘의 목표">
+                        <i data-lucide="list-todo" class="w-6 h-6"></i>
+                    </a>
+                </li>
+                <li>
+                    <a th:href="@{/goals/calendar}" class="tooltip tooltip-right nav-tooltip" data-tip="캘린더">
+                        <i data-lucide="calendar-days" class="w-6 h-6"></i>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </aside>
 
 </body>
+
 </html>
