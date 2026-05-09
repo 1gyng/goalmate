@@ -9,7 +9,7 @@
 
 <body>
     <div class="flex flex-col h-screen">
-        <header th:replace="~{fragments/nav :: topNav}"></header>
+        <header th:replace="~{fragments/nav :: topNav(false)}"></header>
 
         <div class="flex flex-1 overflow-hidden">
             <aside th:replace="~{fragments/nav :: leftNav}"></aside>

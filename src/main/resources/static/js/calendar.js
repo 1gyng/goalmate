@@ -40,7 +40,7 @@ document.addEventListener('DOMContentLoaded', function () {
         headerToolbar: {
             left: 'prev,next today',
             center: 'title',
-            right: 'dayGridMonth,timeGridWeek,listWeek'
+            right: 'dayGridMonth'
         },
         handleWindowResize: true,
         aspectRatio: 1.0,
@@ -53,10 +53,7 @@ document.addEventListener('DOMContentLoaded', function () {
         locale: 'ko',
         buttonText: {
             today: '오늘',
-            month: '월간',
-            week: '주간',
-            day: '일간',
-            list: '목록'
+            month: '월간'
         },
         events: async function (info, successCallback, failureCallback) {
             try {

@@ -5,77 +5,111 @@
 </head>
 
 <body>
-<header th:replace="~{fragments/nav :: topNav}"></header>
+    <div class="flex flex-col h-screen">
+        <header th:replace="~{fragments/nav :: topNav(true)}"></header>
 
-<button id="openLoginModal">로그인</button>
-<button id="openJoinModal">회원가입</button>
+        <div class="m-4">
+            <div class="carousel w-full mx-auto">
+                <div id="slide1" class="carousel-item relative w-full flex-col items-center">
+                    <div class="flex items-center justify-center w-full max-w-[80%] gap-3">
+                        <button type="button" class="btn btn-circle carousel-control" data-target="slide3">❮</button>
+                        <img th:src="@{/img/index_1.png}" class="w-[70%]" alt="index1" />
+                        <button type="button" class="btn btn-circle carousel-control" data-target="slide2">❯</button>
+                    </div>
+                    <div class="text-center">
+                        <p class="font-bold">월간 목표 달성률을 확인해 보세요.</p>
+                        <p class="text-sm">하루가 어땠는지 간단한 기록도 남길 수 있어요.</p>
+                    </div>
+                </div>
 
-<h2>Goal Mate에 대한 소개...</h2>
+                <div id="slide2" class="carousel-item relative w-full flex-col items-center">
+                    <div class="flex items-center justify-center w-full max-w-[80%] gap-3">
+                        <button type="button" class="btn btn-circle carousel-control" data-target="slide1">❮</button>
+                        <img th:src="@{/img/index_2.png}" class="w-[70%]" alt="index2" />
+                        <button type="button" class="btn btn-circle carousel-control" data-target="slide3">❯</button>
+                    </div>
+                    <div class="text-center">
+                        <p class="font-bold">오늘 해야 할 목표를 우선 확인해 보세요.</p>
+                        <p class="text-sm">전체 목표도 함께 살펴볼 수 있어요.</p>
+                    </div>
+                </div>
 
-<dialog id="loginModal" class="modal">
-    <div class="modal-box !max-w-sm rounded-2xl">
-        <form method="dialog" class="modal-form flex flex-col gap-4">
-            <h1 class="text-center text-primary">로그인</h1>
-
-            <input type="text" id="loginIdInput" class="input input-bordered rounded-xl input-primary w-full"
-                   placeholder="아이디">
-            <div class="flex flex-col">
-                <input type="password" id="passwordInput"
-                       class="input input-bordered rounded-xl input-primary w-full" placeholder="비밀번호">
-                <div id="loginErrorMsg" class="errorMsg text-error text-sm min-h-[1.25rem] mt-1 font-semibold">
+                <div id="slide3" class="carousel-item relative w-full flex-col items-center">
+                    <div class="flex items-center justify-center w-full max-w-[80%] gap-3">
+                        <button type="button" class="btn btn-circle carousel-control" data-target="slide2">❮</button>
+                        <img th:src="@{/img/index_3.png}" class="w-[70%]" alt="index3" />
+                        <button type="button" class="btn btn-circle carousel-control" data-target="slide1">❯</button>
+                    </div>
+                    <div class="text-center">
+                        <p class="font-bold">목표를 캘린더에서 쉽게 관리해 보세요.</p>
+                        <p class="text-sm">드래그와 클릭으로 목표를 추가·수정할 수 있어요.</p>
+                    </div>
                 </div>
             </div>
-            <button type="button" id="loginBtn" class="btn btn-outline rounded-xl btn-primary w-full">로그인</button>
-            <div class="flex justify-between gap-2">
-                <button type="submit"
-                        class="btn p-0 btn-link no-underline text-base-content/60 hover:underline">닫기
-                </button>
-                <button type="button" id="loginModalJoinBtn"
+        </div>
+    </div>
+
+    <dialog id="loginModal" class="modal">
+        <div class="modal-box !max-w-sm rounded-2xl">
+            <form method="dialog" class="modal-form flex flex-col gap-4">
+                <h1 class="text-center text-primary">로그인</h1>
+
+                <input type="text" id="loginIdInput" class="input input-bordered rounded-xl input-primary w-full"
+                    placeholder="아이디">
+                <div class="flex flex-col">
+                    <input type="password" id="passwordInput"
+                        class="input input-bordered rounded-xl input-primary w-full" placeholder="비밀번호">
+                    <div id="loginErrorMsg" class="errorMsg text-error text-sm min-h-[1.25rem] mt-1 font-semibold">
+                    </div>
+                </div>
+                <button type="button" id="loginBtn" class="btn btn-outline rounded-xl btn-primary w-full">로그인</button>
+                <div class="flex justify-between gap-2">
+                    <button type="submit" class="btn p-0 btn-link no-underline text-base-content/60 hover:underline">닫기
+                    </button>
+                    <button type="button" id="loginModalJoinBtn"
                         class="btn p-0 btn-link no-underline hover:underline">회원가입
-                </button>
-            </div>
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
         </form>
-    </div>
+    </dialog>
 
-    <form method="dialog" class="modal-backdrop">
-        <button>close</button>
-    </form>
-</dialog>
+    <dialog class="modal" id="joinModal">
+        <div class="modal-box !max-w-sm rounded-2xl">
+            <form method="dialog" class="modal-form flex flex-col gap-4">
+                <h1 class="text-center text-primary">회원가입</h1>
+                <div class="flex w-full gap-2">
+                    <input type="text" id="joinLoginIdInput" class="input input-bordered input-primary rounded-xl grow"
+                        placeholder="아이디">
+                    <button type="button" id="loginIdCheckBtn" class="btn btn-outline btn-primary rounded-xl">중복확인
+                    </button>
+                </div>
+                <input type="password" id="joinPasswordInput"
+                    class="input input-bordered rounded-xl input-primary w-full" placeholder="비밀번호">
+                <div>
+                    <input type="text" id="joinNicknameInput"
+                        class="input input-bordered rounded-xl input-primary w-full" placeholder="닉네임">
+                    <div id="joinErrorMsg" class="errorMsg text-error text-sm min-h-[1.25rem] mt-1 font-semibold"></div>
+                </div>
 
-<dialog class="modal" id="joinModal">
-    <div class="modal-box !max-w-sm rounded-2xl">
-        <form method="dialog" class="modal-form flex flex-col gap-4">
-            <h1 class="text-center text-primary">회원가입</h1>
-            <div class="flex w-full gap-2">
-                <input type="text" id="joinLoginIdInput" class="input input-bordered input-primary rounded-xl grow"
-                       placeholder="아이디">
-                <button type="button" id="loginIdCheckBtn"
-                        class="btn btn-outline btn-primary rounded-xl">중복확인
-                </button>
-            </div>
-            <input type="password" id="joinPasswordInput"
-                   class="input input-bordered rounded-xl input-primary w-full" placeholder="비밀번호">
-            <div>
-                <input type="text" id="joinNicknameInput"
-                       class="input input-bordered rounded-xl input-primary w-full" placeholder="닉네임">
-                <div id="joinErrorMsg" class="errorMsg text-error text-sm min-h-[1.25rem] mt-1 font-semibold"></div>
-            </div>
+                <button type="button" id="joinBtn" class="btn btn-outline rounded-xl btn-primary w-full">가입하기</button>
+                <div class="flex">
+                    <button type="submit" class="btn p-0 btn-link no-underline text-base-content/60 hover:underline">닫기
+                    </button>
+                </div>
+            </form>
+        </div>
 
-            <button type="button" id="joinBtn" class="btn btn-outline rounded-xl btn-primary w-full">가입하기</button>
-            <div class="flex">
-                <button type="submit"
-                        class="btn p-0 btn-link no-underline text-base-content/60 hover:underline">닫기
-                </button>
-            </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
         </form>
-    </div>
+    </dialog>
 
-    <form method="dialog" class="modal-backdrop">
-        <button>close</button>
-    </form>
-</dialog>
-
-<script type="module" th:src="@{/js/index.js}"></script>
+    <script type="module" th:src="@{/js/index.js}"></script>
 </body>
 
 </html>

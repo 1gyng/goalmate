@@ -11,81 +11,80 @@
 </head>
 
 <body>
-<div class="flex flex-col h-screen">
-    <header th:replace="~{fragments/nav :: topNav}"></header>
-    <div class="flex flex-1 overflow-hidden">
-        <aside th:replace="~{fragments/nav :: leftNav}" class="overflow-y-auto"></aside>
-        <div class="flex-1 overflow-y-auto">
-            <div id="calendarContainer">
-                <div id="calendar"></div>
+    <div class="flex flex-col h-screen">
+        <header th:replace="~{fragments/nav :: topNav(false)}"></header>
+        <div class="flex flex-1 overflow-hidden">
+            <aside th:replace="~{fragments/nav :: leftNav}" class="overflow-y-auto"></aside>
+            <div class="flex-1 overflow-y-auto">
+                <div id="calendarContainer">
+                    <div id="calendar"></div>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<dialog id="saveGoalModal" class="modal">
-    <div class="modal-box !max-w-sm rounded-2xl">
-        <form method="dialog" class="modal-form flex flex-col gap-4">
-            <div class="flex justify-between item-center">
-                <h2 id="modalTitle"></h2>
-                <button type="submit" class="btn btn-ghost btn-xs btn-circle">
-                    <i data-lucide="x"></i>
-                </button>
-            </div>
-            <div class="flex gap-4 item-center">
-                <div class="flex item-center gap-1">
-                    <input type="radio" id="daily" name="typeInput" class="radio radio-md radio-primary" value="DAILY"
-                           checked>
-                    <label for="daily">일간</label>
+    <dialog id="saveGoalModal" class="modal">
+        <div class="modal-box !max-w-sm rounded-2xl">
+            <form method="dialog" class="modal-form flex flex-col gap-4">
+                <div class="flex justify-between item-center">
+                    <h2 id="modalTitle"></h2>
+                    <button type="submit" class="btn btn-ghost btn-xs btn-circle">
+                        <i data-lucide="x"></i>
+                    </button>
                 </div>
-                <div class="flex item-center gap-1">
-                    <input type="radio" id="weekly" name="typeInput" class="radio radio-md radio-primary"
-                           value="WEEKLY">
-                    <label for="weekly">주간</label>
+                <div class="flex gap-4 item-center">
+                    <div class="flex item-center gap-1">
+                        <input type="radio" id="daily" name="typeInput" class="radio radio-md radio-primary"
+                            value="DAILY" checked>
+                        <label for="daily">일간</label>
+                    </div>
+                    <div class="flex item-center gap-1">
+                        <input type="radio" id="weekly" name="typeInput" class="radio radio-md radio-primary"
+                            value="WEEKLY">
+                        <label for="weekly">주간</label>
+                    </div>
+                    <div class="flex item-center gap-1">
+                        <input type="radio" id="monthly" name="typeInput" class="radio radio-md radio-primary"
+                            value="MONTHLY">
+                        <label for="monthly">월간</label>
+                    </div>
+                    <div class="flex item-center gap-1">
+                        <input type="radio" id="yearly" name="typeInput" class="radio radio-md radio-primary"
+                            value="YEARLY">
+                        <label for="yearly">연간</label>
+                    </div>
                 </div>
-                <div class="flex item-center gap-1">
-                    <input type="radio" id="monthly" name="typeInput" class="radio radio-md radio-primary"
-                           value="MONTHLY">
-                    <label for="monthly">월간</label>
-                </div>
-                <div class="flex item-center gap-1">
-                    <input type="radio" id="yearly" name="typeInput" class="radio radio-md radio-primary"
-                           value="YEARLY">
-                    <label for="yearly">연간</label>
-                </div>
-            </div>
 
-            <fieldset class="fieldset border-base-300 rounded-box border p-4 w-full">
-                <legend class="fieldset-legend">날짜 선택</legend>
-                <label class="input w-full">
-                    <span class="label">시작일</span>
-                    <input type="date" id="startDateInput"/>
-                </label>
-                <label class="input w-full !pointer-events-none" tabindex="-1">
-                    <span class="label">종료일</span>
-                    <input type="date" id="dueDateInput"/>
-                </label>
-            </fieldset>
-            <input type="text" id="taskInput" class="input w-full" placeholder="목표 입력">
-            <div id="goalModalBtnContainer" class="flex w-full gap-2">
-                <button type="button" id="deleteBtn" class="hidden btn flex-1">삭제</button>
-                <button type="button" id="saveBtn" class="flex-1 btn btn-outline btn-primary">추가</button>
-            </div>
+                <fieldset class="fieldset border-base-300 rounded-box border p-4 w-full">
+                    <legend class="fieldset-legend">날짜 선택</legend>
+                    <label class="input w-full">
+                        <span class="label">시작일</span>
+                        <input type="date" id="startDateInput" />
+                    </label>
+                    <label class="input w-full !pointer-events-none" tabindex="-1">
+                        <span class="label">종료일</span>
+                        <input type="date" id="dueDateInput" />
+                    </label>
+                </fieldset>
+                <input type="text" id="taskInput" class="input w-full" placeholder="목표 입력">
+                <div id="goalModalBtnContainer" class="flex w-full gap-2">
+                    <button type="button" id="deleteBtn" class="hidden btn flex-1">삭제</button>
+                    <button type="button" id="saveBtn" class="flex-1 btn btn-outline btn-primary">추가</button>
+                </div>
+            </form>
+        </div>
+        <form method="dialog" class="modal-backdrop">
+            <button>close</button>
         </form>
+    </dialog>
+    <div class="fixed bottom-8 right-8 z-50">
+        <div class="tooltip" data-tip="목표 추가하기">
+            <button id="openAddGoalBtn" class=" btn btn-circle btn-xl shadow-xl bg-white border-2 border-primary">
+                <i data-lucide="plus" class="w-10 h-10 text-[#92BBA8]"></i>
+            </button>
+        </div>
     </div>
-    <form method="dialog" class="modal-backdrop">
-        <button>close</button>
-    </form>
-</dialog>
-<div class="fixed bottom-8 right-8 z-50">
-    <div class="tooltip" data-tip="목표 추가하기">
-        <button id="openAddGoalBtn"
-                class=" btn btn-circle btn-xl shadow-xl bg-white border-2 border-primary">
-            <i data-lucide="plus" class="w-10 h-10 text-[#92BBA8]"></i>
-        </button>
-    </div>
-</div>
-<th:block th:replace="~{fragments/script :: common-script}"></th:block>
+    <th:block th:replace="~{fragments/script :: common-script}"></th:block>
 </body>
 
 </html>

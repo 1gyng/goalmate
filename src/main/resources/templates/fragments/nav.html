@@ -2,15 +2,22 @@
 <html lang="ko" xmlns:th="http://www.thymeleaf.org">
 
 <body>
-    <header th:fragment="topNav" class="h-16 goal-nav p-3 flex justify-between items-center">
+    <header th:fragment="topNav(isIndex)"
+        class="h-16 goal-nav p-3 flex justify-between items-center">
         <div class="flex items-center">
-            <a href="/">
+            <a th:href="@{${session.loginUser != null} ? '/dashboard' : '/'}">
                 <img th:src="@{/img/symbol.png}" alt="symbol" class="h-12 w-12">
             </a>
-            <a href="/">
+            <a th:href="@{${session.loginUser != null} ? '/dashboard' : '/'}">
                 <img th:src="@{/img/logo.png}" alt="logo" class="h-5">
             </a>
         </div>
+
+        <div th:if="${session.loginUser == null and isIndex}" class="flex gap-2">
+            <button id="openLoginModal" class="btn btn-ghost">로그인</button>
+            <button id="openJoinModal" class="btn btn-ghost">회원가입</button>
+        </div>
+
         <form th:if="${session.loginUser != null}" th:action="@{/logout}" method="post">
             <button type="submit" class="flex mr-6 gap-2 btn btn-ghost"><i data-lucide="log-out"
                     class="h-4 w-4"></i>로그아웃</button>

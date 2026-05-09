@@ -27,6 +27,9 @@ const elements = {
         idCheck: document.getElementById('loginIdCheckBtn'),
         login: document.getElementById('loginBtn'),
         join: document.getElementById('joinBtn')
+    },
+    carousel: {
+        controls: document.querySelectorAll('.carousel-control')
     }
 };
 
@@ -48,6 +51,19 @@ elements.button.joinModal.addEventListener('click', () => {
 elements.button.switchToJoin.addEventListener('click', () => {
     elements.modal.login.close();
     elements.modal.join.showModal();
+});
+
+elements.carousel.controls.forEach(c => {
+    c.addEventListener('click', () => {
+        const targetId = c.dataset.target;
+        const targetElement = document.getElementById(targetId);
+
+        if (targetElement) {
+            targetElement.scrollIntoView({
+                block: 'nearest'
+            });
+        }
+    });
 });
 
 const checkJoinId = async () => {
