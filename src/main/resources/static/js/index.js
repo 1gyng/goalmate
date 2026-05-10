@@ -1,6 +1,6 @@
-import { sendRequest } from './apiUtil.js';
-import { clearModalInput } from './modal.js';
-import { toast } from '/js/uiManager.js';
+import { sendRequest } from '/js/api-util.js';
+import { clearModalInput } from '/js/modal.js';
+import { toast } from '/js/ui-manager.js';
 
 const elements = {
     modal: {
@@ -33,9 +33,9 @@ const elements = {
     }
 };
 
-const apiMessage = {
-    login: (nickname) => `${nickname}님 오늘 목표를 확인해볼까요?`,
-    join: "회원가입이 완료되었습니다!"
+const API_MESSAGES = {
+    LOGIN: (nickname) => `${nickname}님 오늘 목표를 확인해볼까요?`,
+    JOIN: "회원가입이 완료되었습니다!"
 };
 
 elements.button.loginModal.addEventListener('click', () => {
@@ -94,7 +94,7 @@ const join = async () => {
     try {
         await sendRequest('/join', 'POST', joinData);
         elements.modal.join.close();
-        toast.success(apiMessage.join, "bottom");
+        toast.success(API_MESSAGES.JOIN, "bottom");
     } catch (error) {
         elements.errorDiv.join.innerText = error.message;
     }
@@ -109,10 +109,10 @@ const login = async () => {
     try {
         const apiResponse = await sendRequest('/login', 'POST', loginData);
         elements.modal.login.close();
-        toast.success(apiMessage.login(apiResponse.nickname), "bottom");
+        toast.success(API_MESSAGES.LOGIN(apiResponse.nickname), "bottom");
         setTimeout(() => {
             location.replace('/dashboard');
-        }, 1500);
+        }, 1000);
     } catch (error) {
         elements.errorDiv.login.innerText = error.message;
     }

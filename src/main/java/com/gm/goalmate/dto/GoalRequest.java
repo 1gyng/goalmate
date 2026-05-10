@@ -4,6 +4,7 @@ import com.gm.goalmate.domain.goal.GoalResult;
 import com.gm.goalmate.domain.goal.GoalType;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,6 +16,7 @@ public class GoalRequest {
     @Setter
     public static class Add {
         @NotBlank(message = "목표를 입력해주세요.")
+        @Size(max = 20, message = "20자 이내로 입력해주세요.")
         private String task;
 
         @NotNull(message = "구분을 선택해주세요.")
@@ -31,6 +33,7 @@ public class GoalRequest {
     @Setter
     public static class Update {
         @NotBlank(message = "목표를 입력해주세요.")
+        @Size(max = 20, message = "20자 이내로 입력해주세요.")
         private String task;
 
         @NotNull(message = "구분을 선택해주세요.")

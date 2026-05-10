@@ -70,11 +70,6 @@ public class GoalController {
         return ResponseEntity.ok(goals);
     }
 
-/*    @GetMapping(/{goalNum})
-    public ResponseEntity<?> getGoal(@PathVariable Long goalNum, @LoginUser User user) {
-        return ResponseEntity.ok().build();
-    }*/
-
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGoal(@PathVariable Long id, @LoginUser User user) {
         goalService.deleteGoal(id, user.getUserId());

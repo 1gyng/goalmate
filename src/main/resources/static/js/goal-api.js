@@ -1,8 +1,8 @@
-import { sendRequest } from '/js/apiUtil.js';
+import { sendRequest } from '/js/api-util.js';
 
 export const GOAL_API_MESSAGES = {
-    add: "목표가 추가되었습니다!",
-    update: "목표가 수정되었습니다!",
+    ADD: "목표가 추가되었습니다!",
+    UPDATE: "목표가 수정되었습니다!",
     DELETE: "목표가 삭제되었습니다!",
     ERROR: "실패했습니다."
 };

@@ -1,7 +1,7 @@
 import { clearModalInput } from '/js/modal.js';
-import { sendRequest } from '/js/apiUtil.js';
-import { toast } from '/js/uiManager.js';
-import { goalApi, GOAL_API_MESSAGES } from '/js/goalApi.js';
+import { sendRequest } from '/js/api-util.js';
+import { toast } from '/js/ui-manager.js';
+import { goalApi, GOAL_API_MESSAGES } from '/js/goal-api.js';
 
 let selectedDate = '';
 let calendar;
@@ -28,12 +28,6 @@ const elements = {
     }
 };
 
-const apiMessage = {
-    add: "목표가 추가되었습니다!",
-    update: "목표가 수정되었습니다!",
-    delete: "목표가 삭제되었습니다!"
-};
-
 document.addEventListener('DOMContentLoaded', function () {
     const calendarEl = document.getElementById('calendar');
     calendar = new FullCalendar.Calendar(calendarEl, {
@@ -46,7 +40,6 @@ document.addEventListener('DOMContentLoaded', function () {
         aspectRatio: 1.0,
         nowIndicator: true,
         fixedWeekCount: false,
-        editable: true,
         eventOrder: 'priority',
         height: 'auto',
         dayMaxEvents: 3,
@@ -135,7 +128,7 @@ elements.button.saveGoal.addEventListener('click', async () => {
         await sendRequest(url, method, addGoalData);
         calendar.refetchEvents();
         elements.modal.saveGoal.close();
-        toast.success(goalId ? apiMessage.update : apiMessage.add);
+        toast.success(goalId ? GOAL_API_MESSAGES.UPDATE : GOAL_API_MESSAGES.ADD);
     } catch (error) {
         toast.error(error.message);
     }

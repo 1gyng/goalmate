@@ -8,6 +8,12 @@ import lombok.*;
 import java.time.LocalDate;
 
 @Entity
+@Table(
+        name = "goal",
+        indexes = {
+                @Index(name = "idx_goal_user_type_start_date", columnList = "user_id, type, start_date")
+        }
+)
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Goal {
@@ -15,7 +21,7 @@ public class Goal {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long goalId;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 20)
     private String task;
 
     @Enumerated(EnumType.STRING)
