@@ -7,6 +7,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Table(
+        uniqueConstraints = {
+                @UniqueConstraint(name = "uk_user_login_id", columnNames = "login_id")
+        }
+)
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,7 +21,7 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
-    @Column(nullable = false, unique = true)
+    @Column(nullable = false)
     private String loginId;
 
     @Column(nullable = false)
